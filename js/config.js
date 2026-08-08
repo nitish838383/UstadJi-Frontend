@@ -3,7 +3,7 @@
  * Change only API_BASE_URL to connect to any FastAPI backend.
  */
 const CONFIG = {
-  API_BASE_URL: "http://127.0.0.1:8000/", // <-- Change this only
+  API_BASE_URL: "https://ustaji-backend.onrender.com/", // <-- Change this only
   APP_NAME: "UstadJi",
   APP_TAGLINE: "Your Trusted Home Service Partner",
   TOKEN_KEY: "ustadji_access_token",

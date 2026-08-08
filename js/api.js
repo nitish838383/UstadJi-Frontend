@@ -127,31 +127,31 @@ const API = {
   // ========== Auth Endpoints ==========
   auth: {
     register(data) {
-      return API.post("http://127.0.0.1:8000/api/auth/register", data, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com/api/auth/register", data, { auth: false });
     },
     login(data) {
-      return API.post("http://127.0.0.1:8000/api/auth/login", data, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com//api/auth/login", data, { auth: false });
     },
     workerRegister(data) {
-      return API.post("http://127.0.0.1:8000/api/auth/worker/register", data, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com//api/auth/worker/register", data, { auth: false });
     },
     workerLogin(data) {
-      return API.post("http://127.0.0.1:8000/api/auth/worker/login", data, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com/api/auth/worker/login", data, { auth: false });
     },
     logout() {
-      return API.post("http://127.0.0.1:8000/api/auth/logout", {});
+      return API.post("https://ustaji-backend.onrender.com/api/auth/logout", {});
     },
     forgotPassword(data) {
-      return API.post("http://127.0.0.1:8000/api/auth/forgot-password", data, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com/api/auth/forgot-password", data, { auth: false });
     },
     resetPassword(data) {
-      return API.post("http://127.0.0.1:8000/api/auth/reset-password", data, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com/api/auth/reset-password", data, { auth: false });
     },
     refresh(refreshToken) {
-      return API.post("http://127.0.0.1:8000/api/auth/refresh", { refresh_token: refreshToken }, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com/api/auth/refresh", { refresh_token: refreshToken }, { auth: false });
     },
     me() {
-      return API.get("http://127.0.0.1:8000/api/auth/me");
+      return API.get("https://ustaji-backend.onrender.com/api/auth/me");
     },
   },
 
@@ -159,16 +159,16 @@ const API = {
   services: {
     list(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`http://127.0.0.1:8000/api/services${qs ? "?" + qs : ""}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/services${qs ? "?" + qs : ""}`);
     },
     get(id) {
-      return API.get(`http://127.0.0.1:8000/api/services/${id}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/services/${id}`);
     },
     categories() {
-      return API.get("http://127.0.0.1:8000/api/services/categories");
+      return API.get("https://ustaji-backend.onrender.com/api/services/categories");
     },
     search(query) {
-      return API.get(`http://127.0.0.1:8000/api/services/search?q=${encodeURIComponent(query)}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/services/search?q=${encodeURIComponent(query)}`);
     },
   },
 
@@ -176,107 +176,107 @@ const API = {
   workers: {
     list(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`http://127.0.0.1:8000/api/workers${qs ? "?" + qs : ""}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/workers${qs ? "?" + qs : ""}`);
     },
     get(id) {
-      return API.get(`http://127.0.0.1:8000/api/workers/${id}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/workers/${id}`);
     },
     byService(serviceId, params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`http://127.0.0.1:8000/api/workers/service/${serviceId}${qs ? "?" + qs : ""}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/workers/service/${serviceId}${qs ? "?" + qs : ""}`);
     },
     search(query) {
-      return API.get(`http://127.0.0.1:8000/api/workers/search?q=${encodeURIComponent(query)}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/workers/search?q=${encodeURIComponent(query)}`);
     },
     reviews(workerId, params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`http://127.0.0.1:8000/api/workers/${workerId}/reviews${qs ? "?" + qs : ""}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/workers/${workerId}/reviews${qs ? "?" + qs : ""}`);
     },
   },
 
   // ========== Bookings ==========
   bookings: {
     create(data) {
-      return API.post("http://127.0.0.1:8000/api/bookings", data);
+      return API.post("https://ustaji-backend.onrender.com/api/bookings", data);
     },
     list(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`http://127.0.0.1:8000/api/bookings${qs ? "?" + qs : ""}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/bookings${qs ? "?" + qs : ""}`);
     },
     get(id) {
-      return API.get(`http://127.0.0.1:8000/api/bookings/${id}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/bookings/${id}`);
     },
     cancel(id, reason) {
-      return API.post(`http://127.0.0.1:8000/api/bookings/${id}/cancel`, { reason });
+      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/cancel`, { reason });
     },
     reschedule(id, data) {
-      return API.post(`http://127.0.0.1:8000/api/bookings/${id}/reschedule`, data);
+      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/reschedule`, data);
     },
     invoice(id) {
-      return API.get(`http://127.0.0.1:8000/api/bookings/${id}/invoice`);
+      return API.get(`https://ustaji-backend.onrender.com/api/bookings/${id}/invoice`);
     },
     // Worker actions
     accept(id) {
-      return API.post(`http://127.0.0.1:8000/api/bookings/${id}/accept`);
+      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/accept`);
     },
     reject(id, reason) {
-      return API.post(`http://127.0.0.1:8000/api/bookings/${id}/reject`, { reason });
+      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/reject`, { reason });
     },
     start(id) {
-      return API.post(`http://127.0.0.1:8000/api/bookings/${id}/start`);
+      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/start`);
     },
     complete(id) {
-      return API.post(`http://127.0.0.1:8000/api/bookings/${id}/complete`);
+      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/complete`);
     },
     workerList(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`http://127.0.0.1:8000/api/bookings/worker${qs ? "?" + qs : ""}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/bookings/worker${qs ? "?" + qs : ""}`);
     },
   },
 
   // ========== Profile ==========
   profile: {
     get() {
-      return API.get("http://127.0.0.1:8000/api/profile");
+      return API.get("https://ustaji-backend.onrender.com/api/profile");
     },
     update(data) {
-      return API.put("http://127.0.0.1:8000/api/profile", data);
+      return API.put("https://ustaji-backend.onrender.com/api/profile", data);
     },
     uploadAvatar(formData) {
-      return API.upload("http://127.0.0.1:8000/api/profile/avatar", formData);
+      return API.upload("https://ustaji-backend.onrender.com/api/profile/avatar", formData);
     },
     addresses() {
-      return API.get("http://127.0.0.1:8000/api/profile/addresses");
+      return API.get("https://ustaji-backend.onrender.com/api/profile/addresses");
     },
     addAddress(data) {
-      return API.post("http://127.0.0.1:8000/api/profile/addresses", data);
+      return API.post("https://ustaji-backend.onrender.com/api/profile/addresses", data);
     },
     updateAddress(id, data) {
-      return API.put(`http://127.0.0.1:8000/api/profile/addresses/${id}`, data);
+      return API.put(`https://ustaji-backend.onrender.com/api/profile/addresses/${id}`, data);
     },
     deleteAddress(id) {
-      return API.delete(`http://127.0.0.1:8000/api/profile/addresses/${id}`);
+      return API.delete(`https://ustaji-backend.onrender.com/api/profile/addresses/${id}`);
     },
     // Worker specific
     workerProfile() {
-      return API.get("http://127.0.0.1:8000/api/profile/worker");
+      return API.get("https://ustaji-backend.onrender.com/api/profile/worker");
     },
     updateWorkerProfile(data) {
-      return API.put("http://127.0.0.1:8000/api/profile/worker", data);
+      return API.put("https://ustaji-backend.onrender.com/api/profile/worker", data);
     },
     uploadKYC(formData) {
-      return API.upload("http://127.0.0.1:8000/api/profile/worker/kyc", formData);
+      return API.upload("https://ustaji-backend.onrender.com/api/profile/worker/kyc", formData);
     },
   },
 
   // ========== Reviews ==========
   reviews: {
     create(data) {
-      return API.post("http://127.0.0.1:8000/api/reviews", data);
+      return API.post("https://ustaji-backend.onrender.com/api/reviews", data);
     },
     list(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`http://127.0.0.1:8000/api/reviews${qs ? "?" + qs : ""}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/reviews${qs ? "?" + qs : ""}`);
     },
   },
 
@@ -284,74 +284,74 @@ const API = {
   notifications: {
     list(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`http://127.0.0.1:8000/api/notifications${qs ? "?" + qs : ""}`);
+      return API.get(`https://ustaji-backend.onrender.com/api/notifications${qs ? "?" + qs : ""}`);
     },
     markRead(id) {
       return API.patch(`http://127.0.0.1:8000/api/notifications/${id}/read`);
     },
     markAllRead() {
-      return API.post("http://127.0.0.1:8000/api/notifications/read-all");
+      return API.post("https://ustaji-backend.onrender.com/api/notifications/read-all");
     },
     delete(id) {
-      return API.delete(`http://127.0.0.1:8000/api/notifications/${id}`);
+      return API.delete(`https://ustaji-backend.onrender.com/api/notifications/${id}`);
     },
     unreadCount() {
-      return API.get("http://127.0.0.1:8000/api/notifications/unread-count");
+      return API.get("https://ustaji-backend.onrender.com/api/notifications/unread-count");
     },
   },
 
   // ========== Coupons ==========
   coupons: {
     validate(code, bookingData) {
-      return API.post("http://127.0.0.1:8000/api/coupons/validate", { code, ...bookingData });
+      return API.post("https://ustaji-backend.onrender.com/api/coupons/validate", { code, ...bookingData });
     },
   },
 
   // ========== Wishlist ==========
   wishlist: {
     list() {
-      return API.get("http://127.0.0.1:8000/api/wishlist");
+      return API.get("https://ustaji-backend.onrender.com/api/wishlist");
     },
     add(workerId) {
-      return API.post("http://127.0.0.1:8000/api/wishlist", { worker_id: workerId });
+      return API.post("https://ustaji-backend.onrender.com/api/wishlist", { worker_id: workerId });
     },
     remove(workerId) {
-      return API.delete(`http://127.0.0.1:8000/api/wishlist/${workerId}`);
+      return API.delete(`https://ustaji-backend.onrender.com/api/wishlist/${workerId}`);
     },
   },
 
   // ========== Payments ==========
   payments: {
     createOrder(data) {
-      return API.post("http://127.0.0.1:8000/api/payments/create-order", data);
+      return API.post("https://ustaji-backend.onrender.com/api/payments/create-order", data);
     },
     verify(data) {
-      return API.post("http://127.0.0.1:8000/api/payments/verify", data);
+      return API.post("https://ustaji-backend.onrender.com/api/payments/verify", data);
     },
     methods() {
-      return API.get("http://127.0.0.1:8000/api/payments/methods");
+      return API.get("https://ustaji-backend.onrender.com/api/payments/methods");
     },
   },
 
   // ========== Contact ==========
   contact: {
     submit(data) {
-      return API.post("http://127.0.0.1:8000/api/contact", data, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com/api/contact", data, { auth: false });
     },
   },
 
   // ========== Dashboard ==========
   dashboard: {
     user() {
-      return API.get("http://127.0.0.1:8000/api/dashboard/user");
+      return API.get("https://ustaji-backend.onrender.com/api/dashboard/user");
     },
     worker() {
-      return API.get("http://127.0.0.1:8000/api/dashboard/worker");
+      return API.get("https://ustaji-backend.onrender.com/api/dashboard/worker");
     },
   },
 
   // ========== Search ==========
   search(query) {
-    return API.get(`http://127.0.0.1:8000/api/search?q=${encodeURIComponent(query)}`);
+    return API.get(`https://ustaji-backend.onrender.com/api/search?q=${encodeURIComponent(query)}`);
   },
 };
