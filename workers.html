@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professionals – UstadJi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{primary:{50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+  <div id="site-header"></div>
+  <main class="flex-1">
+    <div class="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Find Professionals</h1>
+        <p class="text-slate-500 mt-1">Verified experts ready to help</p>
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1 max-w-md">
+            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="worker-search" placeholder="Search by name or skill…" 
+                   class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-primary-500 outline-none"
+                   oninput="Helper.debounce(() => WorkersModule.applyFilters(), 400)()">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col lg:flex-row gap-6">
+        <!-- Filters -->
+        <aside class="lg:w-64 flex-shrink-0">
+          <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700 sticky top-24 space-y-4">
+            <h3 class="font-semibold text-slate-800 dark:text-white">Filters</h3>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Min Rating</label>
+              <select id="filter-rating" onchange="WorkersModule.applyFilters()" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+                <option value="">Any</option>
+                <option value="4">4+ Stars</option>
+                <option value="3">3+ Stars</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Experience</label>
+              <select id="filter-experience" onchange="WorkersModule.applyFilters()" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+                <option value="">Any</option>
+                <option value="1">1+ years</option>
+                <option value="3">3+ years</option>
+                <option value="5">5+ years</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Availability</label>
+              <select id="filter-availability" onchange="WorkersModule.applyFilters()" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+                <option value="">Any</option>
+                <option value="true">Available Now</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Sort By</label>
+              <select id="filter-sort" onchange="WorkersModule.applyFilters()" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+                <option value="rating">Top Rated</option>
+                <option value="experience">Most Experienced</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+              </select>
+            </div>
+            <button onclick="WorkersModule.applyFilters()" class="w-full py-2.5 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700">Apply</button>
+          </div>
+        </aside>
+        <div class="flex-1">
+          <div id="workers-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+          <div id="workers-pagination"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/js/config.js"></script>
+  <script src="/js/helper.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/workers.js"></script>
+  <script src="/js/notification.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = {};
+      const serviceId = Helper.getQueryParam('service_id');
+      if (serviceId) params.service_id = serviceId;
+      WorkersModule.loadList('workers-grid', params);
+    });
+  </script>
+ <script>
+    Auth.requireAuth();
+</script>
+
+</body>
+</html>

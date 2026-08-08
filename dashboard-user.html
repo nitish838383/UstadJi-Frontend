@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – UstadJi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{primary:{50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+  <div id="site-header"></div>
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <h1 id="dashboard-welcome" class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Welcome back!</h1>
+    <!-- Stats -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <p class="text-xs text-slate-500 mb-1">Active</p>
+        <p id="stat-active" class="text-2xl font-bold text-primary-600">—</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <p class="text-xs text-slate-500 mb-1">Upcoming</p>
+        <p id="stat-upcoming" class="text-2xl font-bold text-sky-600">—</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <p class="text-xs text-slate-500 mb-1">Completed</p>
+        <p id="stat-completed" class="text-2xl font-bold text-emerald-600">—</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <p class="text-xs text-slate-500 mb-1">Notifications</p>
+        <p id="stat-notifications" class="text-2xl font-bold text-amber-600">—</p>
+      </div>
+    </div>
+    <div class="grid lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-semibold text-slate-800 dark:text-white">Active Bookings</h2>
+            <a href="/booking-history.html" class="text-sm text-primary-600 hover:underline">View all</a>
+          </div>
+          <div id="dashboard-active-bookings" class="space-y-3"></div>
+        </div>
+        <!-- Profile section -->
+        <div id="profile" class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+          <h2 class="font-semibold text-slate-800 dark:text-white mb-4">My Profile</h2>
+          <form id="profile-form" onsubmit="ProfileModule.updateProfile(event)" class="space-y-4">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-16 h-16 rounded-full overflow-hidden bg-primary-600 flex items-center justify-center">
+                <img id="profile-avatar-img" class="w-full h-full object-cover hidden" alt="">
+              </div>
+              <label class="text-sm text-primary-600 cursor-pointer hover:underline">
+                Change photo
+                <input type="file" accept="image/*" class="hidden" onchange="ProfileModule.uploadAvatar(event)">
+              </label>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Full Name</label>
+                <input id="profile-name" name="full_name" data-validate="required" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Email</label>
+                <input id="profile-email" name="email" type="email" readonly class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 text-sm text-slate-500">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Phone</label>
+                <input id="profile-phone" name="phone" data-validate="phone" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+              </div>
+            </div>
+            <button type="submit" class="px-6 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700">Save Changes</button>
+          </form>
+        </div>
+      </div>
+      <div class="space-y-6">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+          <h2 class="font-semibold text-slate-800 dark:text-white mb-4">Recent Activity</h2>
+          <div id="dashboard-activity"></div>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-semibold text-slate-800 dark:text-white">Saved Addresses</h2>
+            <button onclick="document.getElementById('add-address-form-wrapper').classList.toggle('hidden')" class="text-sm text-primary-600 hover:underline">+ Add</button>
+          </div>
+          <div id="add-address-form-wrapper" class="hidden mb-4">
+            <form onsubmit="ProfileModule.addAddress(event)" class="space-y-2">
+              <input name="label" placeholder="Label" data-validate="required" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+              <input name="address_line1" placeholder="Address" data-validate="required" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+              <input name="city" placeholder="City" data-validate="required" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+              <input name="pincode" placeholder="Pincode" data-validate="required|pincode" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+              <button type="submit" class="w-full py-2 bg-primary-600 text-white rounded-lg text-sm">Save</button>
+            </form>
+          </div>
+          <div id="addresses-list" class="space-y-2"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/js/config.js"></script>
+  <script src="/js/helper.js"></script>
+  <script src="/js/validation.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script src="/js/profile.js"></script>
+  <script src="/js/notification.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      DashboardModule.loadUserDashboard();
+      ProfileModule.loadUserProfile();
+      ProfileModule.loadAddresses();
+    });
+  </script>
+</body>
+</html>

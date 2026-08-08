@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings – UstadJi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{primary:{50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+  <div id="site-header"></div>
+  <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-8 w-full">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">My Bookings</h1>
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-1">
+      <button onclick="BookingModule.loadHistory('booking-history-list')" class="px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white whitespace-nowrap">All</button>
+      <button onclick="BookingModule.loadHistory('booking-history-list','pending')" class="px-4 py-2 rounded-xl text-sm font-medium border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 whitespace-nowrap">Pending</button>
+      <button onclick="BookingModule.loadHistory('booking-history-list','accepted')" class="px-4 py-2 rounded-xl text-sm font-medium border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 whitespace-nowrap">Active</button>
+      <button onclick="BookingModule.loadHistory('booking-history-list','completed')" class="px-4 py-2 rounded-xl text-sm font-medium border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 whitespace-nowrap">Completed</button>
+      <button onclick="BookingModule.loadHistory('booking-history-list','cancelled')" class="px-4 py-2 rounded-xl text-sm font-medium border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 whitespace-nowrap">Cancelled</button>
+    </div>
+    <div id="booking-history-list" class="space-y-4"></div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/js/config.js"></script>
+  <script src="/js/helper.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/booking.js"></script>
+  <script src="/js/review.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.requireAuth('user')) return;
+      BookingModule.loadHistory('booking-history-list');
+    });
+  </script>
+</body>
+</html>

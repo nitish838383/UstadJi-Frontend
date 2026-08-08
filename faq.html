@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ – UstadJi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{primary:{50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+  <div id="site-header"></div>
+  <main class="flex-1 max-w-3xl mx-auto px-4 sm:px-6 py-12 w-full">
+    <h1 class="text-3xl font-bold text-slate-900 dark:text-white text-center mb-10">Frequently Asked Questions</h1>
+    <div class="space-y-3" id="faq-list">
+      <details class="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 group">
+        <summary class="px-5 py-4 cursor-pointer font-medium flex items-center justify-between list-none">How do I book a service?<i class="fas fa-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i></summary>
+        <p class="px-5 pb-4 text-sm text-slate-500">Browse services, select a professional, choose date & time, and confirm. You'll receive a booking confirmation instantly.</p>
+      </details>
+      <details class="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 group">
+        <summary class="px-5 py-4 cursor-pointer font-medium flex items-center justify-between list-none">Are professionals verified?<i class="fas fa-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i></summary>
+        <p class="px-5 pb-4 text-sm text-slate-500">Yes. All professionals undergo background verification and skill assessment before being listed on UstadJi.</p>
+      </details>
+      <details class="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 group">
+        <summary class="px-5 py-4 cursor-pointer font-medium flex items-center justify-between list-none">What payment methods are accepted?<i class="fas fa-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i></summary>
+        <p class="px-5 pb-4 text-sm text-slate-500">We accept Cash, UPI, Razorpay, and major cards. Pay after the service or online as preferred.</p>
+      </details>
+      <details class="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 group">
+        <summary class="px-5 py-4 cursor-pointer font-medium flex items-center justify-between list-none">Can I cancel a booking?<i class="fas fa-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i></summary>
+        <p class="px-5 pb-4 text-sm text-slate-500">Yes. You can cancel from your booking history. Cancellation policies may apply based on timing.</p>
+      </details>
+      <details class="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 group">
+        <summary class="px-5 py-4 cursor-pointer font-medium flex items-center justify-between list-none">How do I become a professional?<i class="fas fa-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i></summary>
+        <p class="px-5 pb-4 text-sm text-slate-500">Register via the Professional Sign-up page, complete your profile and KYC, and start receiving bookings.</p>
+      </details>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/js/config.js"></script>
+  <script src="/js/helper.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/layout.js"></script>
+</body>
+</html>

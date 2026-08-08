@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register as Professional – UstadJi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{primary:{50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+  <div id="site-header"></div>
+  <main class="flex-1 flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-8">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <i class="fas fa-user-plus text-white text-xl"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Become a Professional</h1>
+        <p class="text-slate-500 mt-1">Join UstadJi and grow your business</p>
+      </div>
+      <form id="worker-register-form" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 sm:p-8 space-y-4">
+        <input type="text" id="full_name" data-validate="required" placeholder="Full Name" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none">
+        <input type="email" id="email" data-validate="required|email" placeholder="Email" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none">
+        <input type="tel" id="phone" data-validate="required|phone" placeholder="Phone (10 digits)" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none">
+        <input type="password" id="password" data-validate="required|password" placeholder="Password" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none">
+        <input type="number" id="experience" placeholder="Years of experience" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none">
+        <input type="text" id="service_area" placeholder="Service area / City" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none">
+        <label class="flex items-start gap-2 text-sm text-slate-600"><input type="checkbox" required class="mt-1 rounded text-primary-600"> I agree to Terms & Privacy Policy</label>
+        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold">Register</button>
+        <p class="text-center text-sm text-slate-500">Already registered? <a href="/worker-login.html" class="text-emerald-600 font-medium hover:underline">Login</a></p>
+      </form>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/js/config.js"></script>
+  <script src="/js/helper.js"></script>
+  <script src="/js/validation.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    Auth.redirectIfAuthenticated();
+    document.getElementById('worker-register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const { valid } = Validation.validateForm(e.target);
+      if (!valid) return;
+      try {
+        Helper.showLoader();
+        await Auth.workerRegister({
+          full_name: document.getElementById('full_name').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          password: document.getElementById('password').value,
+          experience_years: document.getElementById('experience').value,
+          service_area: document.getElementById('service_area').value,
+        });
+        Helper.toast('Registration successful!', 'success');
+        window.location.href = '/dashboard-worker.html';
+      } catch (err) {
+        Helper.toast(err.message, 'error');
+      } finally {
+        Helper.hideLoader();
+      }
+    });
+  </script>
+</body>
+</html>

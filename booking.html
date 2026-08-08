@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Service – UstadJi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{primary:{50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+  <div id="site-header"></div>
+  <main class="flex-1 max-w-3xl mx-auto px-4 sm:px-6 py-8 w-full">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Book a Service</h1>
+    <form id="booking-form" class="space-y-6">
+      <!-- Service Info -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Service</h2>
+        <div id="booking-service-info"><p class="text-sm text-slate-400">Loading…</p></div>
+      </div>
+      <!-- Worker Info -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700" id="worker-info-section">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Professional</h2>
+        <div id="booking-worker-info"><p class="text-sm text-slate-400">Select a professional or leave blank for auto-assign</p></div>
+      </div>
+      <!-- Address -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Service Address</h2>
+        <div id="booking-addresses" class="space-y-3"></div>
+      </div>
+      <!-- Date & Time -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Date & Time</h2>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Select Date</label>
+          <input type="date" id="booking-date" required class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Select Time Slot</label>
+          <div id="time-slots" class="flex flex-wrap gap-2"></div>
+        </div>
+      </div>
+      <!-- Coupon -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Coupon</h2>
+        <div class="flex gap-2">
+          <input type="text" id="coupon-code" placeholder="Enter coupon code" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none text-sm">
+          <button type="button" id="apply-coupon-btn" class="px-4 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-600">Apply</button>
+        </div>
+      </div>
+      <!-- Payment -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Payment Method</h2>
+        <div class="space-y-2">
+          <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-primary-300">
+            <input type="radio" name="payment_method" value="cash" checked class="text-primary-600 focus:ring-primary-500">
+            <i class="fas fa-money-bill-wave text-emerald-600"></i>
+            <span class="text-sm font-medium">Cash on Service</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-primary-300">
+            <input type="radio" name="payment_method" value="upi" class="text-primary-600 focus:ring-primary-500">
+            <i class="fas fa-qrcode text-primary-600"></i>
+            <span class="text-sm font-medium">UPI</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-primary-300">
+            <input type="radio" name="payment_method" value="razorpay" class="text-primary-600 focus:ring-primary-500">
+            <i class="fas fa-credit-card text-indigo-600"></i>
+            <span class="text-sm font-medium">Razorpay / Card</span>
+          </label>
+        </div>
+      </div>
+      <!-- Notes -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Additional Notes</label>
+        <textarea id="booking-notes" rows="2" placeholder="Any special instructions…" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none text-sm resize-none"></textarea>
+      </div>
+      <button type="submit" class="w-full py-4 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold text-lg transition-colors shadow-lg shadow-primary-600/25">
+        Confirm Booking
+      </button>
+    </form>
+  </main>
+  <!-- Add Address Modal -->
+  <div id="add-address-modal" class="fixed inset-0 z-[100] hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="BookingModule.hideAddAddress()"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <form onsubmit="BookingModule.saveAddress(event)" class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 relative space-y-4">
+        <button type="button" onclick="BookingModule.hideAddAddress()" class="absolute top-4 right-4 text-slate-400"><i class="fas fa-times"></i></button>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Add Address</h3>
+        <input name="label" placeholder="Label (Home/Office)" data-validate="required" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+        <input name="address_line1" placeholder="Address Line 1" data-validate="required" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+        <input name="city" placeholder="City" data-validate="required" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+        <input name="pincode" placeholder="Pincode" data-validate="required|pincode" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+        <input name="phone" placeholder="Phone" data-validate="required|phone" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+        <button type="submit" class="w-full py-3 bg-primary-600 text-white rounded-xl font-semibold">Save Address</button>
+      </form>
+    </div>
+  </div>
+  <div id="site-footer"></div>
+  <script src="/js/config.js"></script>
+  <script src="/js/helper.js"></script>
+  <script src="/js/validation.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/booking.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => BookingModule.init());</script>
+</body>
+</html>

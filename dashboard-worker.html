@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worker Dashboard – UstadJi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{primary:{50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+  <div id="site-header"></div>
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <h1 id="dashboard-welcome" class="text-2xl font-bold text-slate-900 dark:text-white">Hello!</h1>
+      <div class="flex items-center gap-2 text-sm">
+        <span class="text-slate-500">KYC:</span>
+        <span id="kyc-status">—</span>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <p class="text-xs text-slate-500 mb-1">Requests</p>
+        <p id="stat-requests" class="text-2xl font-bold text-amber-600">—</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <p class="text-xs text-slate-500 mb-1">Today</p>
+        <p id="stat-today" class="text-2xl font-bold text-primary-600">—</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <p class="text-xs text-slate-500 mb-1">Completed</p>
+        <p id="stat-completed" class="text-2xl font-bold text-emerald-600">—</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <p class="text-xs text-slate-500 mb-1">Earnings</p>
+        <p id="stat-earnings" class="text-xl font-bold text-slate-800 dark:text-white">—</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+        <p class="text-xs text-slate-500 mb-1">Rating</p>
+        <p id="stat-rating" class="text-2xl font-bold text-amber-500">—</p>
+      </div>
+    </div>
+    <div class="grid lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2" id="bookings">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-semibold text-slate-800 dark:text-white">Booking Requests</h2>
+            <div class="flex gap-2">
+              <button onclick="DashboardModule.loadWorkerBookings('pending')" class="px-3 py-1 text-xs rounded-lg bg-primary-50 text-primary-700 dark:bg-primary-900/20">Pending</button>
+              <button onclick="DashboardModule.loadWorkerBookings()" class="px-3 py-1 text-xs rounded-lg border border-slate-200 dark:border-slate-600">All</button>
+            </div>
+          </div>
+          <div id="worker-bookings-list" class="space-y-4"></div>
+        </div>
+      </div>
+      <div class="space-y-6">
+        <div id="profile" class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+          <h2 class="font-semibold text-slate-800 dark:text-white mb-4">My Profile</h2>
+          <form onsubmit="ProfileModule.updateWorkerProfile(event)" class="space-y-3">
+            <input id="worker-name" name="full_name" placeholder="Full Name" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+            <input id="worker-phone" name="phone" placeholder="Phone" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+            <textarea id="worker-bio" name="bio" rows="2" placeholder="About you" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm resize-none"></textarea>
+            <input id="worker-experience" name="experience_years" type="number" placeholder="Years of experience" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+            <input id="worker-rate" name="hourly_rate" type="number" placeholder="Hourly rate (₹)" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+            <input id="worker-area" name="service_area" placeholder="Service area" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm">
+            <button type="submit" class="w-full py-2.5 bg-primary-600 text-white rounded-xl text-sm font-medium">Update Profile</button>
+          </form>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+          <h2 class="font-semibold text-slate-800 dark:text-white mb-4">KYC Upload</h2>
+          <form onsubmit="ProfileModule.uploadKYC(event)" class="space-y-3">
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">Aadhaar / ID</label>
+              <input type="file" name="id_document" accept="image/*,.pdf" required class="text-sm">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">Selfie</label>
+              <input type="file" name="selfie" accept="image/*" class="text-sm">
+            </div>
+            <button type="submit" class="w-full py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-medium">Upload Documents</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/js/config.js"></script>
+  <script src="/js/helper.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/booking.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script src="/js/profile.js"></script>
+  <script src="/js/notification.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      DashboardModule.loadWorkerDashboard();
+      ProfileModule.loadWorkerProfile();
+    });
+  </script>
+</body>
+</html>

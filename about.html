@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us – UstadJi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{primary:{50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+  <div id="site-header"></div>
+  <main class="flex-1">
+    <section class="bg-gradient-to-br from-primary-600 to-primary-900 text-white py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl font-bold mb-4">About UstadJi</h1>
+        <p class="text-primary-100 text-lg max-w-2xl mx-auto">Your trusted partner for quality home services across India</p>
+      </div>
+    </section>
+    <section class="max-w-4xl mx-auto px-4 sm:px-6 py-16">
+      <div class="prose dark:prose-invert max-w-none">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Our Mission</h2>
+        <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">UstadJi connects customers with skilled, verified professionals for all home service needs — from electrical and plumbing to cleaning and repairs. We believe everyone deserves reliable, transparent, and affordable home services.</p>
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Why Choose Us</h2>
+        <div class="grid sm:grid-cols-2 gap-6 not-prose">
+          <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+            <i class="fas fa-shield-alt text-2xl text-primary-600 mb-3"></i>
+            <h3 class="font-semibold mb-1">Verified Professionals</h3>
+            <p class="text-sm text-slate-500">Background-checked and skill-verified experts</p>
+          </div>
+          <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+            <i class="fas fa-rupee-sign text-2xl text-primary-600 mb-3"></i>
+            <h3 class="font-semibold mb-1">Transparent Pricing</h3>
+            <p class="text-sm text-slate-500">No hidden charges. Clear upfront quotes</p>
+          </div>
+          <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+            <i class="fas fa-star text-2xl text-primary-600 mb-3"></i>
+            <h3 class="font-semibold mb-1">Quality Guarantee</h3>
+            <p class="text-sm text-slate-500">Satisfaction assured on every job</p>
+          </div>
+          <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+            <i class="fas fa-headset text-2xl text-primary-600 mb-3"></i>
+            <h3 class="font-semibold mb-1">24/7 Support</h3>
+            <p class="text-sm text-slate-500">Always here to help you</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/js/config.js"></script>
+  <script src="/js/helper.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/layout.js"></script>
+ <script>
+    Auth.requireAuth();
+</script>
+
+</body>
+</html>

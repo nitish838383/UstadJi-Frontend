@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="UstadJi - Book trusted home service professionals. Electricians, plumbers, cleaners and more at your doorstep.">
+  <meta name="theme-color" content="#2563eb">
+  <title>UstadJi – Trusted Home Services at Your Doorstep</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
+              400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
+              800: '#1e40af', 900: '#1e3a8a',
+            }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col min-h-screen">
+
+  <div id="site-header"></div>
+
+  <main class="flex-1">
+    <!-- Hero -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative">
+        <div class="max-w-2xl">
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight mb-4">
+            Home Services,<br><span class="text-primary-200">Done Right</span>
+          </h1>
+          <p class="text-lg sm:text-xl text-primary-100 mb-8 leading-relaxed">
+            Book verified professionals for electrical, plumbing, cleaning & more. Quality guaranteed, at your convenience.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a href="/services.html" class="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white text-primary-700 rounded-xl font-semibold hover:bg-primary-50 transition-colors shadow-xl">
+              <i class="fas fa-search"></i> Explore Services
+            </a>
+            <a href="/workers.html" class="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary-500/30 backdrop-blur border border-white/30 text-white rounded-xl font-semibold hover:bg-primary-500/50 transition-colors">
+              <i class="fas fa-user-hard-hat"></i> Find Professionals
+            </a>
+          </div>
+          <div class="flex items-center gap-6 mt-10 text-sm text-primary-200">
+            <div class="flex items-center gap-2"><i class="fas fa-shield-alt"></i> Verified Pros</div>
+            <div class="flex items-center gap-2"><i class="fas fa-star"></i> Top Rated</div>
+            <div class="flex items-center gap-2"><i class="fas fa-clock"></i> On-Time</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+      <div id="home-categories" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+      </div>
+    </section>
+
+    <!-- Popular Services -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Popular Services</h2>
+          <p class="text-slate-500 mt-1">Most booked services this week</p>
+        </div>
+        <a href="/services.html" class="text-primary-600 font-medium text-sm hover:underline hidden sm:inline">View all →</a>
+      </div>
+      <div id="home-services" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      </div>
+      <div class="text-center mt-6 sm:hidden">
+        <a href="/services.html" class="text-primary-600 font-medium text-sm">View all services →</a>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="bg-white dark:bg-slate-900 py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">How UstadJi Works</h2>
+          <p class="text-slate-500 mt-2">Book a professional in 3 simple steps</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="text-center" data-animate>
+            <div class="w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 flex items-center justify-center text-2xl mx-auto mb-4">
+              <i class="fas fa-search"></i>
+            </div>
+            <h3 class="font-semibold text-lg text-slate-800 dark:text-white mb-2">1. Choose Service</h3>
+            <p class="text-sm text-slate-500">Browse categories and select the service you need</p>
+          </div>
+          <div class="text-center" data-animate>
+            <div class="w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 flex items-center justify-center text-2xl mx-auto mb-4">
+              <i class="fas fa-user-check"></i>
+            </div>
+            <h3 class="font-semibold text-lg text-slate-800 dark:text-white mb-2">2. Pick a Pro</h3>
+            <p class="text-sm text-slate-500">View profiles, ratings & reviews of verified professionals</p>
+          </div>
+          <div class="text-center" data-animate>
+            <div class="w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 flex items-center justify-center text-2xl mx-auto mb-4">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <h3 class="font-semibold text-lg text-slate-800 dark:text-white mb-2">3. Book & Relax</h3>
+            <p class="text-sm text-slate-500">Select date, time & address. We'll handle the rest</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="bg-gradient-to-r from-primary-600 to-primary-800 rounded-3xl p-8 sm:p-12 text-center text-white relative overflow-hidden">
+        <div class="relative z-10">
+          <h2 class="text-2xl sm:text-3xl font-bold mb-3">Are you a skilled professional?</h2>
+          <p class="text-primary-100 mb-6 max-w-lg mx-auto">Join UstadJi and grow your business. Get verified, receive bookings, and earn more.</p>
+          <a href="/worker-register.html" class="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-primary-700 rounded-xl font-semibold hover:bg-primary-50 transition-colors shadow-xl">
+            <i class="fas fa-user-plus"></i> Register as Professional
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/helper.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/services.js"></script>
+  <script src="/js/notification.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      ServicesModule.loadCategories('home-categories');
+      ServicesModule.loadList('home-services', { popular: true, limit: 8 });
+      Helper.initScrollAnimations();
+    });
+  </script>
+
+</body>
+</html>
