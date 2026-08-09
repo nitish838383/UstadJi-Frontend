@@ -1,10 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login - UstadJi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
 </head>
-<body>
-$END$
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+  <div class="w-full max-w-md">
+
+    <!-- Logo & Title -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-2xl shadow-lg mb-4">
+        <i class="fas fa-tools text-white text-2xl"></i>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900">UstadJi Admin</h1>
+      <p class="text-gray-500 mt-1 text-sm">Sign in to access the admin panel</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
+
+      <!-- Error Message (hidden by default) -->
+      <div id="errorBox" class="hidden mb-5 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorText">Invalid email or password</span>
+      </div>
+
+      <form id="loginForm" class="space-y-5">
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
+              <i class="fas fa-envelope text-sm"></i>
+            </span>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="admin@ustadji.com"
+              required
+              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+            />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
+              <i class="fas fa-lock text-sm"></i>
+            </span>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              required
+              class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+            />
+            <button
+              type="button"
+              id="togglePassword"
+              class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600"
+            >
+              <i class="fas fa-eye text-sm" id="eyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember + Forgot -->
+        <div class="flex items-center justify-between text-sm">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+            <span class="text-gray-600">Remember me</span>
+          </label>
+          <a href="#" class="text-primary-600 hover:text-primary-700 font-medium">Forgot password?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          id="loginBtn"
+          class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+        >
+          <span id="btnText">Sign In</span>
+          <i class="fas fa-arrow-right text-sm" id="btnIcon"></i>
+        </button>
+      </form>
+
+      <!-- Demo Credentials -->
+      <div class="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-xl">
+        <p class="text-xs font-semibold text-blue-800 mb-1.5 flex items-center gap-1.5">
+          <i class="fas fa-info-circle"></i> Demo Credentials
+        </p>
+        <div class="text-xs text-blue-700 space-y-0.5">
+          <p><span class="font-medium">Email:</span> admin@ustadji.com</p>
+          <p><span class="font-medium">Password:</span> admin123</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-sm text-gray-500 mt-6">
+      © 2026 UstadJi. All rights reserved.
+    </p>
+  </div>
+
+  <script>
+    // Toggle password visibility
+    const toggleBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    toggleBtn.addEventListener('click', () => {
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+      eyeIcon.classList.toggle('fa-eye');
+      eyeIcon.classList.toggle('fa-eye-slash');
+    });
+
+    // Login form handling
+    const form = document.getElementById('loginForm');
+    const errorBox = document.getElementById('errorBox');
+    const errorText = document.getElementById('errorText');
+    const loginBtn = document.getElementById('loginBtn');
+    const btnText = document.getElementById('btnText');
+    const btnIcon = document.getElementById('btnIcon');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Hide previous error
+      errorBox.classList.add('hidden');
+
+      // Show loading state
+      loginBtn.disabled = true;
+      btnText.textContent = 'Signing in...';
+      btnIcon.className = 'fas fa-spinner fa-spin text-sm';
+
+      // Simulate network delay
+      setTimeout(() => {
+        // Demo credentials check
+        if (email === 'admin@ustadji.com' && password === 'admin123') {
+          // Success → redirect to admin dashboard
+          btnText.textContent = 'Success!';
+          btnIcon.className = 'fas fa-check text-sm';
+          loginBtn.classList.remove('bg-primary-600', 'hover:bg-primary-700');
+          loginBtn.classList.add('bg-green-600');
+
+          setTimeout(() => {
+            window.location.href = 'admin-dashboard.html';
+          }, 600);
+        } else {
+          // Error
+          errorText.textContent = 'Invalid email or password. Please try again.';
+          errorBox.classList.remove('hidden');
+
+          // Reset button
+          loginBtn.disabled = false;
+          btnText.textContent = 'Sign In';
+          btnIcon.className = 'fas fa-arrow-right text-sm';
+        }
+      }, 800);
+    });
+  </script>
 </body>
 </html>
