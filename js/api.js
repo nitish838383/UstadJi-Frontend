@@ -127,31 +127,31 @@ const API = {
   // ========== Auth Endpoints ==========
   auth: {
     register(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/auth/register", data, { auth: false });
+      return API.post("/auth/register", data, { auth: false });
     },
     login(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/auth/login", data, { auth: false });
+      return API.post("/auth/login", data, { auth: false });
     },
     workerRegister(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/auth/worker/register", data, { auth: false });
+      return API.post("/auth/worker/register", data, { auth: false });
     },
     workerLogin(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/auth/worker/login", data, { auth: false });
+      return API.post("/auth/worker/login", data, { auth: false });
     },
     logout() {
-      return API.post("https://ustaji-backend.onrender.com/api/auth/logout", {});
+      return API.post("/auth/logout", {});
     },
     forgotPassword(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/auth/forgot-password", data, { auth: false });
+      return API.post("/auth/forgot-password", data, { auth: false });
     },
     resetPassword(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/auth/reset-password", data, { auth: false });
+      return API.post("/auth/reset-password", data, { auth: false });
     },
     refresh(refreshToken) {
-      return API.post("https://ustaji-backend.onrender.com/api/auth/refresh", { refresh_token: refreshToken }, { auth: false });
+      return API.post("/auth/refresh", { refresh_token: refreshToken }, { auth: false });
     },
     me() {
-      return API.get("https://ustaji-backend.onrender.com/api/auth/me");
+      return API.get("/auth/me");
     },
   },
 
@@ -159,16 +159,16 @@ const API = {
   services: {
     list(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/services${qs ? "?" + qs : ""}`);
+      return API.get(`/services${qs ? "?" + qs : ""}`);
     },
     get(id) {
-      return API.get(`https://ustaji-backend.onrender.com/api/services/${id}`);
+      return API.get(`/services/${id}`);
     },
     categories() {
-      return API.get("https://ustaji-backend.onrender.com/api/services/categories");
+      return API.get("/services/categories");
     },
     search(query) {
-      return API.get(`https://ustaji-backend.onrender.com/api/services/search?q=${encodeURIComponent(query)}`);
+      return API.get(`/services/search?q=${encodeURIComponent(query)}`);
     },
   },
 
@@ -176,107 +176,107 @@ const API = {
   workers: {
     list(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/workers${qs ? "?" + qs : ""}`);
+      return API.get(`/workers${qs ? "?" + qs : ""}`);
     },
     get(id) {
-      return API.get(`https://ustaji-backend.onrender.com/api/workers/${id}`);
+      return API.get(`/workers/${id}`);
     },
     byService(serviceId, params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/workers/service/${serviceId}${qs ? "?" + qs : ""}`);
+      return API.get(`/workers/service/${serviceId}${qs ? "?" + qs : ""}`);
     },
     search(query) {
-      return API.get(`https://ustaji-backend.onrender.com/api/workers/search?q=${encodeURIComponent(query)}`);
+      return API.get(`/workers/search?q=${encodeURIComponent(query)}`);
     },
     reviews(workerId, params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/workers/${workerId}/reviews${qs ? "?" + qs : ""}`);
+      return API.get(`/workers/${workerId}/reviews${qs ? "?" + qs : ""}`);
     },
   },
 
   // ========== Bookings ==========
   bookings: {
     create(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/bookings", data);
+      return API.post("/bookings", data);
     },
     list(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/bookings${qs ? "?" + qs : ""}`);
+      return API.get(`/bookings${qs ? "?" + qs : ""}`);
     },
     get(id) {
-      return API.get(`https://ustaji-backend.onrender.com/api/bookings/${id}`);
+      return API.get(`/bookings/${id}`);
     },
     cancel(id, reason) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/cancel`, { reason });
+      return API.post(`/bookings/${id}/cancel`, { reason });
     },
     reschedule(id, data) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/reschedule`, data);
+      return API.post(`/bookings/${id}/reschedule`, data);
     },
     invoice(id) {
-      return API.get(`https://ustaji-backend.onrender.com/api/bookings/${id}/invoice`);
+      return API.get(`/bookings/${id}/invoice`);
     },
     // Worker actions
     accept(id) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/accept`);
+      return API.post(`/bookings/${id}/accept`);
     },
     reject(id, reason) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/reject`, { reason });
+      return API.post(`/bookings/${id}/reject`, { reason });
     },
     start(id) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/start`);
+      return API.post(`/bookings/${id}/start`);
     },
     complete(id) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/complete`);
+      return API.post(`/bookings/${id}/complete`);
     },
     workerList(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/bookings/worker${qs ? "?" + qs : ""}`);
+      return API.get(`/bookings/worker${qs ? "?" + qs : ""}`);
     },
   },
 
   // ========== Profile ==========
   profile: {
     get() {
-      return API.get("https://ustaji-backend.onrender.com/api/profile");
+      return API.get("/profile");
     },
     update(data) {
-      return API.put("https://ustaji-backend.onrender.com/api/profile", data);
+      return API.put("/profile", data);
     },
     uploadAvatar(formData) {
-      return API.upload("https://ustaji-backend.onrender.com/api/profile/avatar", formData);
+      return API.upload("/profile/avatar", formData);
     },
     addresses() {
-      return API.get("https://ustaji-backend.onrender.com/api/profile/addresses");
+      return API.get("/profile/addresses");
     },
     addAddress(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/profile/addresses", data);
+      return API.post("/profile/addresses", data);
     },
     updateAddress(id, data) {
-      return API.put(`https://ustaji-backend.onrender.com/api/profile/addresses/${id}`, data);
+      return API.put(`/profile/addresses/${id}`, data);
     },
     deleteAddress(id) {
-      return API.delete(`https://ustaji-backend.onrender.com/api/profile/addresses/${id}`);
+      return API.delete(`/profile/addresses/${id}`);
     },
     // Worker specific
     workerProfile() {
-      return API.get("https://ustaji-backend.onrender.com/api/profile/worker");
+      return API.get("/profile/worker");
     },
     updateWorkerProfile(data) {
-      return API.put("https://ustaji-backend.onrender.com/api/profile/worker", data);
+      return API.put("/profile/worker", data);
     },
     uploadKYC(formData) {
-      return API.upload("https://ustaji-backend.onrender.com/api/profile/worker/kyc", formData);
+      return API.upload("/profile/worker/kyc", formData);
     },
   },
 
   // ========== Reviews ==========
   reviews: {
     create(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/reviews", data);
+      return API.post("/reviews", data);
     },
     list(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/reviews${qs ? "?" + qs : ""}`);
+      return API.get(`/reviews${qs ? "?" + qs : ""}`);
     },
   },
 
@@ -284,74 +284,77 @@ const API = {
   notifications: {
     list(params = {}) {
       const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/notifications${qs ? "?" + qs : ""}`);
+      return API.get(`/notifications${qs ? "?" + qs : ""}`);
     },
     markRead(id) {
-      return API.patch(`https://ustaji-backend.onrender.com/api/notifications/${id}/read`);
+      return API.patch(`/notifications/${id}/read`);
     },
     markAllRead() {
-      return API.post("https://ustaji-backend.onrender.com/api/notifications/read-all");
+      return API.post("/notifications/read-all");
     },
     delete(id) {
-      return API.delete(`https://ustaji-backend.onrender.com/api/notifications/${id}`);
+      return API.delete(`/notifications/${id}`);
     },
     unreadCount() {
-      return API.get("https://ustaji-backend.onrender.com/api/notifications/unread-count");
+      return API.get("/notifications/unread-count");
     },
   },
 
   // ========== Coupons ==========
   coupons: {
     validate(code, bookingData) {
-      return API.post("https://ustaji-backend.onrender.com/api/coupons/validate", { code, ...bookingData });
+      return API.post("/coupons/validate", { code, ...bookingData });
     },
   },
 
   // ========== Wishlist ==========
   wishlist: {
     list() {
-      return API.get("https://ustaji-backend.onrender.com/api/wishlist");
+      return API.get("/wishlist");
     },
     add(workerId) {
-      return API.post("https://ustaji-backend.onrender.com/api/wishlist", { worker_id: workerId });
+      return API.post("/wishlist", { worker_id: workerId });
     },
     remove(workerId) {
-      return API.delete(`https://ustaji-backend.onrender.com/api/wishlist/${workerId}`);
+      return API.delete(`/wishlist/${workerId}`);
     },
   },
 
   // ========== Payments ==========
   payments: {
     createOrder(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/payments/create-order", data);
+      return API.post("/payments/create-order", data);
     },
     verify(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/payments/verify", data);
+      return API.post("/payments/verify", data);
     },
     methods() {
-      return API.get("https://ustaji-backend.onrender.com/api/payments/methods");
+      return API.get("/payments/methods");
     },
   },
 
   // ========== Contact ==========
   contact: {
     submit(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/contact", data, { auth: false });
+      return API.post("/contact", data, { auth: false });
     },
   },
 
   // ========== Dashboard ==========
   dashboard: {
     user() {
-      return API.get("https://ustaji-backend.onrender.com/api/dashboard/user");
+      return API.get("/dashboard/user");
     },
     worker() {
-      return API.get("https://ustaji-backend.onrender.com/api/dashboard/worker");
+      return API.get("/dashboard/worker");
+    },
+    stats() {
+      return API.get("/dashboard/stats");
     },
   },
 
   // ========== Search ==========
   search(query) {
-    return API.get(`https://ustaji-backend.onrender.com/api/search?q=${encodeURIComponent(query)}`);
+    return API.get(`/search?q=${encodeURIComponent(query)}`);
   },
 };
