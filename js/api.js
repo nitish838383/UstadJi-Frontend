@@ -137,7 +137,7 @@ const API = {
       return API.post("https://ustaji-backend.onrender.com/api/auth/login", data, { auth: false });
     },
     workerRegister(data) {
-      return API.post("https://ustaji-backend.onrender.com/auth/worker/register", data, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com/api/auth/worker/register", data, { auth: false });
     },
     workerLogin(data) {
       return API.post("/auth/worker/login", data, { auth: false });
