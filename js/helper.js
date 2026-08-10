@@ -3,6 +3,10 @@
  */
 
 const Helper = {
+  // Store retry callbacks so buttons can call them by id
+  _retryCallbacks: {},
+  _retryId: 0,
+
   /**
    * Format currency in Indian Rupees
    */
@@ -52,6 +56,8 @@ const Helper = {
     if (!dateStr) return "";
     const date = new Date(dateStr);
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (seconds < 0) return "Just now";
+
     const intervals = [
       { label: "year", seconds: 31536000 },
       { label: "month", seconds: 2592000 },
@@ -79,18 +85,20 @@ const Helper = {
    * Generate star rating HTML
    */
   renderStars(rating, max = 5) {
-    const full = Math.floor(rating || 0);
-    const half = rating % 1 >= 0.5 ? 1 : 0;
-    const empty = max - full - half;
+    const value = Number(rating) || 0;
+    const full = Math.floor(value);
+    const half = value % 1 >= 0.5 ? 1 : 0;
+    const empty = Math.max(0, max - full - half);
     let html = "";
     for (let i = 0; i < full; i++) html += '<i class="fas fa-star text-amber-400"></i>';
     if (half) html += '<i class="fas fa-star-half-alt text-amber-400"></i>';
-    for (let i = 0; i < empty; i++) html += '<i class="far fa-star text-gray-300"></i>';
+    for (let i = 0; i < empty; i++) html += '<i class="far fa-star text-gray-300 dark:text-gray-600"></i>';
     return html;
   },
 
   /**
    * Debounce function
+   * NOTE: Create once and reuse. Don't call Helper.debounce() inside oninput every time.
    */
   debounce(fn, delay = 300) {
     let timer;
@@ -122,7 +130,8 @@ const Helper = {
    * Show toast notification
    */
   toast(message, type = "info", duration = 3500) {
-    const container = document.getElementById("toast-container") || this._createToastContainer();
+    const container =
+      document.getElementById("toast-container") || this._createToastContainer();
     const colors = {
       success: "bg-emerald-600",
       error: "bg-rose-600",
@@ -136,17 +145,19 @@ const Helper = {
       info: "fa-info-circle",
     };
     const toast = document.createElement("div");
-    toast.className = `flex items-center gap-3 px-4 py-3 rounded-xl text-white shadow-lg ${colors[type] || colors.info} animate-slide-in pointer-events-auto`;
+    toast.className = `flex items-center gap-3 px-4 py-3 rounded-xl text-white shadow-lg ${
+      colors[type] || colors.info
+    } animate-slide-in pointer-events-auto`;
     toast.innerHTML = `
       <i class="fas ${icons[type] || icons.info} text-lg"></i>
       <span class="flex-1 text-sm font-medium">${message}</span>
-      <button class="opacity-70 hover:opacity-100" onclick="this.parentElement.remove()">
+      <button type="button" class="opacity-70 hover:opacity-100" onclick="this.parentElement.remove()">
         <i class="fas fa-times"></i>
       </button>
     `;
     container.appendChild(toast);
     setTimeout(() => {
-      toast.classList.add("opacity-0", "translate-x-4");
+      toast.classList.add("opacity-0", "translate-x-4", "transition-all", "duration-300");
       setTimeout(() => toast.remove(), 300);
     }, duration);
   },
@@ -154,22 +165,22 @@ const Helper = {
   _createToastContainer() {
     const el = document.createElement("div");
     el.id = "toast-container";
-    el.className = "fixed top-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none";
+    el.className =
+      "fixed top-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none";
     document.body.appendChild(el);
     return el;
   },
 
   /**
-   * Show loading skeleton / spinner overlay
+   * Show loading overlay
    */
-  showLoader(target = "body") {
-    const parent = target === "body" ? document.body : document.querySelector(target);
-    if (!parent) return;
+  showLoader() {
     let loader = document.getElementById("global-loader");
     if (!loader) {
       loader = document.createElement("div");
       loader.id = "global-loader";
-      loader.className = "fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] flex items-center justify-center";
+      loader.className =
+        "fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] flex items-center justify-center";
       loader.innerHTML = `
         <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-3">
           <div class="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
@@ -201,12 +212,22 @@ const Helper = {
   },
 
   /**
-   * Error state
+   * Error state with working Retry button
    */
   errorState(message = "Something went wrong", retryFn = null) {
-    const retryBtn = retryFn
-      ? `<button onclick="(${retryFn})()" class="mt-4 px-5 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition">Try Again</button>`
-      : "";
+    let retryBtn = "";
+
+    if (typeof retryFn === "function") {
+      const id = ++this._retryId;
+      this._retryCallbacks[id] = retryFn;
+      retryBtn = `
+        <button type="button"
+                onclick="Helper.runRetry(${id})"
+                class="mt-4 px-5 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition">
+          Try Again
+        </button>`;
+    }
+
     return `
       <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
         <div class="w-20 h-20 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center mb-4">
@@ -217,6 +238,17 @@ const Helper = {
         ${retryBtn}
       </div>
     `;
+  },
+
+  /**
+   * Called by Retry button
+   */
+  runRetry(id) {
+    const fn = this._retryCallbacks[id];
+    if (typeof fn === "function") {
+      fn();
+      // optional: delete this._retryCallbacks[id];
+    }
   },
 
   /**
@@ -274,6 +306,8 @@ const Helper = {
    */
   initScrollAnimations() {
     const elements = document.querySelectorAll("[data-animate]");
+    if (!elements.length) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -303,7 +337,10 @@ const Helper = {
    */
   applyTheme() {
     const saved = localStorage.getItem(CONFIG.THEME_KEY);
-    if (saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+    if (
+      saved === "dark" ||
+      (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
@@ -328,6 +365,7 @@ const Helper = {
     if (!name) return "?";
     return name
       .split(" ")
+      .filter(Boolean)
       .map((n) => n[0])
       .join("")
       .substring(0, 2)
@@ -339,18 +377,59 @@ const Helper = {
    */
   statusBadge(status) {
     const map = {
-      pending: { bg: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300", label: "Pending" },
-      accepted: { bg: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300", label: "Accepted" },
-      assigned: { bg: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300", label: "Assigned" },
-      on_the_way: { bg: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300", label: "On The Way" },
-      started: { bg: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300", label: "Started" },
-      completed: { bg: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300", label: "Completed" },
-      cancelled: { bg: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300", label: "Cancelled" },
-      paid: { bg: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300", label: "Paid" },
-      failed: { bg: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300", label: "Failed" },
-      refunded: { bg: "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300", label: "Refunded" },
+      pending: {
+        bg: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+        label: "Pending",
+      },
+      accepted: {
+        bg: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
+        label: "Accepted",
+      },
+      assigned: {
+        bg: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
+        label: "Assigned",
+      },
+      on_the_way: {
+        bg: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
+        label: "On The Way",
+      },
+      started: {
+        bg: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+        label: "Started",
+      },
+      completed: {
+        bg: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+        label: "Completed",
+      },
+      cancelled: {
+        bg: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
+        label: "Cancelled",
+      },
+      paid: {
+        bg: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+        label: "Paid",
+      },
+      failed: {
+        bg: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
+        label: "Failed",
+      },
+      refunded: {
+        bg: "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300",
+        label: "Refunded",
+      },
+      verified: {
+        bg: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+        label: "Verified",
+      },
+      rejected: {
+        bg: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
+        label: "Rejected",
+      },
     };
-    const s = map[status?.toLowerCase()] || { bg: "bg-slate-100 text-slate-700", label: status || "Unknown" };
+    const s = map[status?.toLowerCase()] || {
+      bg: "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300",
+      label: status || "Unknown",
+    };
     return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${s.bg}">${s.label}</span>`;
   },
 };

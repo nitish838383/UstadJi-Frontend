@@ -1,13 +1,8 @@
 /**
  * UstadJi - Centralized API Client
  * All HTTP requests go through this module.
+ * CONFIG is loaded from config.js — do NOT redeclare it here.
  */
-
-const CONFIG = {
-  API_BASE_URL: "https://ustaji-backend.onrender.com/api",
-  RETRY_ATTEMPTS: 2,
-  REQUEST_TIMEOUT: 15000,
-};
 
 const API = {
   /**
@@ -36,7 +31,10 @@ const API = {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    const url = `${CONFIG.API_BASE_URL}${endpoint}`;   // ← missing piece
+    // Safe URL join
+    const base = (CONFIG.API_BASE_URL || "").replace(/\/+$/, "");
+    const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    const url = `${base}${path}`;
 
     const fetchOptions = {
       method,
@@ -58,7 +56,6 @@ const API = {
         if (response.status === 401 && auth) {
           const refreshed = await Auth.refreshToken();
           if (refreshed) {
-            // Retry original request with new token
             return this.request(endpoint, { ...options, retry: 0 });
           }
           Auth.logout(true);
@@ -221,7 +218,6 @@ const API = {
     invoice(id) {
       return API.get(`/bookings/${id}/invoice`);
     },
-    // Worker actions
     accept(id) {
       return API.post(`/bookings/${id}/accept`);
     },
@@ -263,7 +259,6 @@ const API = {
     deleteAddress(id) {
       return API.delete(`/profile/addresses/${id}`);
     },
-    // Worker specific
     workerProfile() {
       return API.get("/profile/worker");
     },
