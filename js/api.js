@@ -131,13 +131,13 @@ const API = {
   // ========== Auth Endpoints ==========
   auth: {
     register(data) {
-      return API.post("api/auth/register", data, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com/api/auth/register", data, { auth: false });
     },
     login(data) {
-      return API.post("api/auth/login", data, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com/api/auth/login", data, { auth: false });
     },
     workerRegister(data) {
-      return API.post("/auth/worker/register", data, { auth: false });
+      return API.post("https://ustaji-backend.onrender.com/auth/worker/register", data, { auth: false });
     },
     workerLogin(data) {
       return API.post("/auth/worker/login", data, { auth: false });
