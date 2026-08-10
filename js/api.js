@@ -346,50 +346,112 @@ const AdminApp = {
       AdminUI.toast(e.message, "error");
     }
   },
+async loadWorkers(kyc) {
+  const q = document.getElementById("workers-q")?.value || "";
 
-  async loadWorkers(kyc) {
-    const q = document.getElementById("workers-q")?.value || "";
-    const kyc_status = kyc ?? document.getElementById("workers-kyc")?.value || "";
-    const box = document.getElementById("workers-table");
-    if (!box) return;
-    box.innerHTML = '<p class="empty">Loading…</p>';
-    try {
-      const params = { q, page: 1, limit: 50 };
-      if (kyc_status) params.kyc_status = kyc_status;
-      const data = await AdminAPI.workers(params);
-      const rows = data.results || [];
-      if (!rows.length) {
-        box.innerHTML = '<p class="empty">No workers found</p>';
-        return;
-      }
-      box.innerHTML = `<div class="table-wrap"><table class="admin-table"><thead><tr>
-        <th>ID</th><th>Worker</th><th>Contact</th><th>KYC</th><th>Available</th><th>Rating</th><th>Earnings</th><th>Actions</th>
-      </tr></thead><tbody>
-      ${rows
-        .map(
-          (u) => `<tr>
-        <td>${u.worker_id || u.id}</td>
-        <td>${u.full_name}<div style="font-size:11px;color:#64748b">${u.skills || ""}</div></td>
-        <td>${u.email}<br>${u.phone || "—"}</td>
-        <td>${AdminUI.badge(u.kyc_status || "pending")}</td>
-        <td>${u.is_available ? "Yes" : "No"}</td>
-        <td>${AdminUI.stars(u.rating)}</td>
-        <td>${AdminUI.money(u.total_earnings)}</td>
-        <td class="actions">
-          <button class="btn btn-success" onclick="AdminApp.setKyc(${u.id},'approved')">Approve</button>
-          <button class="btn btn-danger" onclick="AdminApp.setKyc(${u.id},'rejected')">Reject</button>
-          <button class="btn" onclick="AdminApp.toggleUser(${u.id}, ${!u.is_active})">${u.is_active ? "Suspend" : "Enable"}</button>
-        </td>
-      </tr>`
-        )
-        .join("")}
-      </tbody></table></div>`;
-    } catch (e) {
-      box.innerHTML = `<p class="empty">${e.message}</p>`;
-      AdminUI.toast(e.message, "error");
+  const kyc_status =
+    kyc ?? (document.getElementById("workers-kyc")?.value || "");
+
+  const box = document.getElementById("workers-table");
+
+  if (!box) return;
+
+  box.innerHTML = "Loading…";
+
+  try {
+    const params = {
+      q,
+      page: 1,
+      limit: 50
+    };
+
+    if (kyc_status) {
+      params.kyc_status = kyc_status;
     }
-  },
 
+    const data = await AdminAPI.workers(params);
+
+    const rows = data.results || [];
+
+    if (!rows.length) {
+      box.innerHTML = "No workers found";
+      return;
+    }
+
+    box.innerHTML = `
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Worker</th>
+              <th>Contact</th>
+              <th>KYC</th>
+              <th>Available</th>
+              <th>Rating</th>
+              <th>Earnings</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${rows.map((u) => `
+              <tr>
+                <td>${u.worker_id || u.id}</td>
+
+                <td>
+                  ${u.full_name || "—"}
+                  <br>
+                  <small>${u.skills || ""}</small>
+                </td>
+
+                <td>
+                  ${u.email || "—"}
+                  <br>
+                  ${u.phone || "—"}
+                </td>
+
+                <td>
+                  ${AdminUI.badge(u.kyc_status || "pending")}
+                </td>
+
+                <td>
+                  ${u.is_available ? "Yes" : "No"}
+                </td>
+
+                <td>
+                  ${AdminUI.stars(u.rating || 0)}
+                </td>
+
+                <td>
+                  ${AdminUI.money(u.total_earnings || 0)}
+                </td>
+
+                <td>
+                  <button onclick="approveWorker(${u.worker_id || u.id})">
+                    Approve
+                  </button>
+
+                  <button onclick="rejectWorker(${u.worker_id || u.id})">
+                    Reject
+                  </button>
+
+                  <button onclick="toggleWorker(${u.worker_id || u.id})">
+                    ${u.is_active ? "Suspend" : "Enable"}
+                  </button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+  } catch (e) {
+    box.innerHTML = `<p class="empty">${e.message}</p>`;
+    AdminUI.toast(e.message, "error");
+  }
+},
   async setKyc(id, kyc_status) {
     if (!confirm(`Set KYC to ${kyc_status}?`)) return;
     try {
