@@ -1,7 +1,6 @@
 /**
  * UstadJi - Centralized API Client
  * All HTTP requests go through this module.
- * CONFIG is loaded from config.js — do NOT redeclare it here.
  */
 
 const API = {
@@ -19,6 +18,12 @@ const API = {
       isFormData = false,
     } = options;
 
+
+    const url = endpoint.startsWith("http")
+    ? endpoint
+    : `${(CONFIG.API_BASE_URL || "").replace(/\/+$/, "")}${
+    endpoint.startsWith("/") ? endpoint : `/${endpoint}`
+    }`;
     const defaultHeaders = {};
     if (!isFormData) defaultHeaders["Content-Type"] = "application/json";
     defaultHeaders["Accept"] = "application/json";
@@ -30,11 +35,6 @@ const API = {
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-    // Safe URL join
-    const base = (CONFIG.API_BASE_URL || "").replace(/\/+$/, "");
-    const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-    const url = `${base}${path}`;
 
     const fetchOptions = {
       method,
@@ -56,6 +56,7 @@ const API = {
         if (response.status === 401 && auth) {
           const refreshed = await Auth.refreshToken();
           if (refreshed) {
+            // Retry original request with new token
             return this.request(endpoint, { ...options, retry: 0 });
           }
           Auth.logout(true);
@@ -130,10 +131,10 @@ const API = {
   // ========== Auth Endpoints ==========
   auth: {
     register(data) {
-      return API.post("/auth/register", data, { auth: false });
+      return API.post("api/auth/register", data, { auth: false });
     },
     login(data) {
-      return API.post("/auth/login", data, { auth: false });
+      return API.post("api/auth/login", data, { auth: false });
     },
     workerRegister(data) {
       return API.post("/auth/worker/register", data, { auth: false });
@@ -218,6 +219,7 @@ const API = {
     invoice(id) {
       return API.get(`/bookings/${id}/invoice`);
     },
+    // Worker actions
     accept(id) {
       return API.post(`/bookings/${id}/accept`);
     },
@@ -259,6 +261,7 @@ const API = {
     deleteAddress(id) {
       return API.delete(`/profile/addresses/${id}`);
     },
+    // Worker specific
     workerProfile() {
       return API.get("/profile/worker");
     },
@@ -354,7 +357,7 @@ const API = {
     },
   },
 
-  // ========== Admin ==========
+
   admin: {
     login(data) {
       return API.post("/admin/login", data, { auth: false });
