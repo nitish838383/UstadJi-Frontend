@@ -21,58 +21,425 @@ const BookingModule = {
   async init() {
     if (!Auth.requireAuth("user")) return;
 
+    // Get IDs from URL
     this.state.service_id = Helper.getQueryParam("service_id");
     this.state.worker_id = Helper.getQueryParam("worker_id");
 
+    // Load saved addresses
     await this.loadAddresses();
-    if (this.state.service_id) await this.loadServiceInfo();
-    if (this.state.worker_id) await this.loadWorkerInfo();
+
+    // Load selected service + professionals
+    if (this.state.service_id) {
+      await this.loadServiceInfo();
+      await this.loadProfessionals();
+    }
+
+    // If specific worker was already selected
+    if (this.state.worker_id) {
+      await this.loadWorkerInfo();
+    }
+
+    // Bind form events
     this.bindEvents();
   },
 
+  /**
+   * Load selected service information
+   */
   async loadServiceInfo() {
     try {
       const service = await API.services.get(this.state.service_id);
+
       const el = document.getElementById("booking-service-info");
+
       if (el) {
         el.innerHTML = `
           <div class="flex items-center gap-3">
-            <img src="${service.image_url || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=100"}" class="w-14 h-14 rounded-xl object-cover" onerror="this.src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=100'">
+
+            <img
+              src="${service.image_url || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=100"}"
+              class="w-14 h-14 rounded-xl object-cover"
+              onerror="this.src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=100'"
+            >
+
             <div>
-              <p class="font-semibold text-slate-800 dark:text-white">${service.title || service.name}</p>
-              <p class="text-sm text-primary-600 font-medium">${Helper.formatCurrency(service.starting_price || 0)} onwards</p>
+              <p class="font-semibold text-slate-800 dark:text-white">
+                ${service.title || service.name}
+              </p>
+
+              <p class="text-sm text-primary-600 font-medium">
+                ${Helper.formatCurrency(service.starting_price || 0)} onwards
+              </p>
             </div>
+
           </div>
         `;
       }
+
       this.state.service = service;
+
     } catch (err) {
+      console.error("Failed to load service:", err);
       Helper.toast("Failed to load service", "error");
     }
   },
 
+  /**
+   * Load professionals according to selected service
+   */
+  async loadProfessionals() {
+    const container = document.getElementById("booking-worker-info");
+
+    if (!container || !this.state.service_id) {
+      return;
+    }
+
+    // If a specific worker is already selected,
+    // loadWorkerInfo() will display that worker.
+    if (this.state.worker_id) {
+      return;
+    }
+
+    // Loading state
+    container.innerHTML = `
+      <p class="text-sm text-slate-400">
+        Loading professionals...
+      </p>
+    `;
+
+    try {
+      console.log(
+        "Loading professionals for service:",
+        this.state.service_id
+      );
+
+      // Call:
+      // GET /api/workers/service/{service_id}
+      const data = await API.workers.byService(
+        this.state.service_id
+      );
+
+      console.log("Professionals API response:", data);
+
+      // Handle different possible API response formats
+      const workers =
+        data?.results ||
+        data?.items ||
+        data?.workers ||
+        data ||
+        [];
+
+      // No workers
+      if (!Array.isArray(workers) || workers.length === 0) {
+        container.innerHTML = `
+          <div class="py-3">
+            <p class="text-sm text-slate-400">
+              No professionals available for this service.
+            </p>
+
+            <p class="text-xs text-slate-400 mt-1">
+              You can leave this blank for auto-assignment.
+            </p>
+          </div>
+        `;
+
+        return;
+      }
+
+      // Render workers
+      container.innerHTML = `
+        <div class="space-y-3">
+
+          ${workers
+            .map(
+              (worker) => `
+                <label class="block cursor-pointer">
+
+                  <input
+                    type="radio"
+                    name="professional"
+                    value="${worker.id}"
+                    class="sr-only peer"
+                    onchange="BookingModule.selectProfessional('${worker.id}')"
+                  >
+
+                  <div
+                    class="
+                      p-4
+                      rounded-xl
+                      border-2
+                      border-slate-200
+                      dark:border-slate-700
+                      peer-checked:border-primary-500
+                      peer-checked:bg-primary-50
+                      dark:peer-checked:bg-primary-900/20
+                      hover:border-primary-300
+                      transition-all
+                    "
+                  >
+
+                    <div class="flex items-center gap-3">
+
+                      <!-- Avatar -->
+                      <div
+                        class="
+                          w-11
+                          h-11
+                          rounded-full
+                          bg-primary-600
+                          text-white
+                          flex
+                          items-center
+                          justify-center
+                          font-bold
+                          flex-shrink-0
+                        "
+                      >
+                        ${Helper.getInitials(
+                          worker.full_name ||
+                          worker.name ||
+                          "W"
+                        )}
+                      </div>
+
+                      <!-- Worker information -->
+                      <div class="flex-1 min-w-0">
+
+                        <p
+                          class="
+                            font-semibold
+                            text-slate-800
+                            dark:text-white
+                          "
+                        >
+                          ${
+                            worker.full_name ||
+                            worker.name ||
+                            "Professional"
+                          }
+                        </p>
+
+                        <div
+                          class="
+                            flex
+                            items-center
+                            gap-1
+                            text-xs
+                            text-slate-500
+                            mt-1
+                          "
+                        >
+                          ${Helper.renderStars(
+                            worker.rating || 0
+                          )}
+
+                          <span>
+                            ${Number(
+                              worker.rating || 0
+                            ).toFixed(1)}
+                          </span>
+                        </div>
+
+                        ${
+                          worker.phone
+                            ? `
+                              <p class="text-xs text-slate-400 mt-1">
+                                ${worker.phone}
+                              </p>
+                            `
+                            : ""
+                        }
+
+                      </div>
+
+                      <!-- Radio indicator -->
+                      <div
+                        class="
+                          w-5
+                          h-5
+                          rounded-full
+                          border-2
+                          border-slate-300
+                          peer-checked:border-primary-500
+                          peer-checked:bg-primary-500
+                          flex-shrink-0
+                        "
+                      ></div>
+
+                    </div>
+
+                  </div>
+
+                </label>
+              `
+            )
+            .join("")}
+
+        </div>
+
+        <!-- Auto assignment option -->
+        <div class="mt-3">
+
+          <button
+            type="button"
+            onclick="BookingModule.clearProfessional()"
+            class="
+              text-xs
+              text-primary-600
+              hover:underline
+            "
+          >
+            Leave blank for auto-assign
+          </button>
+
+        </div>
+      `;
+
+    } catch (err) {
+      console.error(
+        "Failed to load professionals:",
+        err
+      );
+
+      container.innerHTML = `
+        <div class="py-3">
+
+          <p class="text-sm text-rose-500">
+            Failed to load professionals.
+          </p>
+
+          <button
+            type="button"
+            onclick="BookingModule.loadProfessionals()"
+            class="
+              mt-2
+              text-xs
+              text-primary-600
+              hover:underline
+            "
+          >
+            Try again
+          </button>
+
+        </div>
+      `;
+    }
+  },
+
+  /**
+   * Select professional
+   */
+  selectProfessional(workerId) {
+    this.state.worker_id = workerId;
+
+    console.log(
+      "Selected professional:",
+      workerId
+    );
+  },
+
+  /**
+   * Clear professional selection
+   * Backend can auto-assign worker
+   */
+  clearProfessional() {
+    this.state.worker_id = null;
+
+    document
+      .querySelectorAll(
+        'input[name="professional"]'
+      )
+      .forEach((input) => {
+        input.checked = false;
+      });
+
+    console.log(
+      "Professional cleared - auto assign enabled"
+    );
+  },
+
+  /**
+   * Load specifically selected worker
+   */
   async loadWorkerInfo() {
     try {
-      const worker = await API.workers.get(this.state.worker_id);
-      const el = document.getElementById("booking-worker-info");
+      const worker = await API.workers.get(
+        this.state.worker_id
+      );
+
+      const el = document.getElementById(
+        "booking-worker-info"
+      );
+
       if (el) {
         el.innerHTML = `
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold">
-              ${Helper.getInitials(worker.full_name || worker.name || "W")}
+
+            <div
+              class="
+                w-12
+                h-12
+                rounded-full
+                bg-primary-600
+                flex
+                items-center
+                justify-center
+                text-white
+                font-bold
+              "
+            >
+              ${Helper.getInitials(
+                worker.full_name ||
+                worker.name ||
+                "W"
+              )}
             </div>
+
             <div>
-              <p class="font-semibold text-slate-800 dark:text-white">${worker.full_name || worker.name}</p>
-              <div class="flex items-center gap-1 text-xs">${Helper.renderStars(worker.rating || 0)} · ${worker.rating?.toFixed(1) || "0"}</div>
+
+              <p
+                class="
+                  font-semibold
+                  text-slate-800
+                  dark:text-white
+                "
+              >
+                ${
+                  worker.full_name ||
+                  worker.name ||
+                  "Professional"
+                }
+              </p>
+
+              <div class="flex items-center gap-1 text-xs">
+                ${Helper.renderStars(
+                  worker.rating || 0
+                )}
+                ·
+                ${worker.rating?.toFixed(1) || "0"}
+              </div>
+
             </div>
+
           </div>
         `;
       }
+
       this.state.worker = worker;
+
     } catch (err) {
-      Helper.toast("Failed to load professional", "error");
+      console.error(
+        "Failed to load professional:",
+        err
+      );
+
+      Helper.toast(
+        "Failed to load professional",
+        "error"
+      );
     }
   },
+
 
   async loadAddresses() {
     const container = document.getElementById("booking-addresses");

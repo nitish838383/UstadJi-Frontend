@@ -208,7 +208,7 @@ const CONFIG = {
       return API.get(`https://ustaji-backend.onrender.com/api/bookings/${id}`);
     },
     cancel(id, reason) {
-      return API.post(`https://ustaji-backend.onrender.com/apibookings/${id}/cancel`, { reason });
+      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/cancel`, { reason });
     },
     reschedule(id, data) {
       return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/reschedule`, data);
