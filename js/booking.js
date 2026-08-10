@@ -13,7 +13,13 @@ const BookingModule = {
     payment_method: "cash",
     notes: "",
     summary: null,
+    service: null,
+    worker: null,
+    discount: 0,
   },
+
+  // Cache workers so selectWorker can get the full object
+  workersMap: {},
 
   /**
    * Initialize booking form page
@@ -26,7 +32,6 @@ const BookingModule = {
 
     await this.loadAddresses();
     if (this.state.service_id) await this.loadServiceInfo();
-    // Always load professional picker (list + optional pre-selected worker)
     await this.loadProfessionals();
     this.bindEvents();
   },
@@ -38,7 +43,9 @@ const BookingModule = {
       if (el) {
         el.innerHTML = `
           <div class="flex items-center gap-3">
-            <img src="${service.image_url || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=100"}" class="w-14 h-14 rounded-xl object-cover" onerror="this.src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=100'">
+            <img src="${service.image_url || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=100"}"
+                 class="w-14 h-14 rounded-xl object-cover"
+                 onerror="this.src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=100'">
             <div>
               <p class="font-semibold text-slate-800 dark:text-white">${service.title || service.name}</p>
               <p class="text-sm text-primary-600 font-medium">${Helper.formatCurrency(service.starting_price || 0)} onwards</p>
@@ -63,17 +70,19 @@ const BookingModule = {
   },
 
   /**
-   * Load professionals for booking picker (real API)
-   * - Optional auto-assign (no worker)
-   * - List from /workers or /workers/service/{id}
+   * Load professionals for booking picker
    */
   async loadProfessionals() {
     const el = document.getElementById("booking-worker-info");
     if (!el) return;
+
     el.innerHTML = `<p class="text-sm text-slate-400">Loading professionals…</p>`;
+    this.workersMap = {};
 
     try {
       let workers = [];
+
+      // Prefer workers for the selected service
       if (this.state.service_id && API.workers.byService) {
         try {
           const data = await API.workers.byService(this.state.service_id, { limit: 30 });
@@ -82,18 +91,28 @@ const BookingModule = {
           workers = [];
         }
       }
+
+      // Fallback to all workers
       if (!workers.length) {
         const data = await API.workers.list({ limit: 30 });
         workers = data.results || data.items || data || [];
       }
-      // Only active/available when fields exist
+
       workers = (Array.isArray(workers) ? workers : []).filter((w) => w.is_active !== false);
+
+      // Cache them
+      workers.forEach((w) => {
+        this.workersMap[String(w.id)] = w;
+      });
 
       const selectedId = this.state.worker_id ? String(this.state.worker_id) : "";
 
       const autoCard = `
-        <label class="flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${!selectedId ? "border-primary-500 bg-primary-50 dark:bg-primary-900/10" : "border-slate-200 dark:border-slate-700 hover:border-primary-300"}">
-          <input type="radio" name="worker_id" value="" ${!selectedId ? "checked" : ""} class="mt-1 text-primary-600 focus:ring-primary-500" onchange="BookingModule.selectWorker('')">
+        <label class="flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all
+          ${!selectedId ? "border-primary-500 bg-primary-50 dark:bg-primary-900/10" : "border-slate-200 dark:border-slate-700 hover:border-primary-300"}">
+          <input type="radio" name="worker_id" value="" ${!selectedId ? "checked" : ""}
+                 class="mt-1 text-primary-600 focus:ring-primary-500"
+                 onchange="BookingModule.selectWorker('')">
           <div class="flex-1 min-w-0">
             <p class="font-medium text-slate-800 dark:text-white text-sm">Auto-assign</p>
             <p class="text-xs text-slate-500 mt-0.5">We’ll assign an available professional for you</p>
@@ -112,31 +131,37 @@ const BookingModule = {
           const id = String(w.id);
           const sel = selectedId === id;
           const name = w.full_name || w.name || "Professional";
-          const rating = w.rating != null ? Number(w.rating).toFixed(1) : "0";
+          const rating = w.rating != null ? Number(w.rating).toFixed(1) : "0.0";
           const area = w.service_area || w.city || "";
+
           return `
-          <label class="flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${sel ? "border-primary-500 bg-primary-50 dark:bg-primary-900/10" : "border-slate-200 dark:border-slate-700 hover:border-primary-300"}">
-            <input type="radio" name="worker_id" value="${id}" ${sel ? "checked" : ""} class="mt-1 text-primary-600 focus:ring-primary-500" onchange="BookingModule.selectWorker('${id}')">
-            <div class="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-              ${Helper.getInitials(name)}
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="font-medium text-slate-800 dark:text-white text-sm truncate">${name}</p>
-              <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 mt-0.5">
-                <span>${Helper.renderStars ? Helper.renderStars(w.rating || 0) : "★"} ${rating}</span>
-                ${area ? `<span>· ${area}</span>` : ""}
-                ${w.is_available === false ? `<span class="text-amber-600">Busy</span>` : `<span class="text-emerald-600">Available</span>`}
+            <label class="flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all
+              ${sel ? "border-primary-500 bg-primary-50 dark:bg-primary-900/10" : "border-slate-200 dark:border-slate-700 hover:border-primary-300"}">
+              <input type="radio" name="worker_id" value="${id}" ${sel ? "checked" : ""}
+                     class="mt-1 text-primary-600 focus:ring-primary-500"
+                     onchange="BookingModule.selectWorker('${id}')">
+              <div class="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                ${Helper.getInitials(name)}
               </div>
-            </div>
-          </label>`;
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-slate-800 dark:text-white text-sm truncate">${name}</p>
+                <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 mt-0.5">
+                  <span>${Helper.renderStars ? Helper.renderStars(w.rating || 0) : "★"} ${rating}</span>
+                  ${area ? `<span>· ${area}</span>` : ""}
+                  ${w.is_available === false
+                    ? `<span class="text-amber-600">Busy</span>`
+                    : `<span class="text-emerald-600">Available</span>`}
+                </div>
+              </div>
+            </label>`;
         })
         .join("");
 
       el.innerHTML = `<div class="space-y-3">${autoCard}${cards}</div>`;
 
-      if (selectedId) {
-        const w = workers.find((x) => String(x.id) === selectedId);
-        if (w) this.state.worker = w;
+      // Restore selected worker object if present
+      if (selectedId && this.workersMap[selectedId]) {
+        this.state.worker = this.workersMap[selectedId];
       } else {
         this.state.worker_id = null;
         this.state.worker = null;
@@ -151,6 +176,7 @@ const BookingModule = {
           </div>
         </label>`;
       this.state.worker_id = null;
+      this.state.worker = null;
     }
   },
 
@@ -160,16 +186,19 @@ const BookingModule = {
       this.state.worker = null;
     } else {
       this.state.worker_id = id;
+      this.state.worker = this.workersMap[id] || null;
     }
-    // refresh border styles
-    document.querySelectorAll('#booking-worker-info label').forEach((lab) => {
+
+    // Update visual selection
+    document.querySelectorAll("#booking-worker-info label").forEach((lab) => {
       const input = lab.querySelector('input[name="worker_id"]');
-      const on = input && String(input.value) === String(id || "");
-      lab.classList.toggle("border-primary-500", on);
-      lab.classList.toggle("bg-primary-50", on);
-      lab.classList.toggle("dark:bg-primary-900/10", on);
-      lab.classList.toggle("border-slate-200", !on);
-      lab.classList.toggle("dark:border-slate-700", !on);
+      const isSelected = input && String(input.value) === String(id || "");
+
+      lab.classList.toggle("border-primary-500", isSelected);
+      lab.classList.toggle("bg-primary-50", isSelected);
+      lab.classList.toggle("dark:bg-primary-900/10", isSelected);
+      lab.classList.toggle("border-slate-200", !isSelected);
+      lab.classList.toggle("dark:border-slate-700", !isSelected);
     });
   },
 
@@ -185,7 +214,8 @@ const BookingModule = {
         container.innerHTML = `
           <div class="text-center py-6">
             <p class="text-sm text-slate-500 mb-3">No saved addresses</p>
-            <button type="button" onclick="BookingModule.showAddAddress()" class="text-primary-600 font-medium text-sm hover:underline">
+            <button type="button" onclick="BookingModule.showAddAddress()"
+                    class="text-primary-600 font-medium text-sm hover:underline">
               + Add New Address
             </button>
           </div>
@@ -193,21 +223,31 @@ const BookingModule = {
         return;
       }
 
-      container.innerHTML = addresses
-        .map(
-          (a, i) => `
-        <label class="flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${i === 0 ? "border-primary-500 bg-primary-50 dark:bg-primary-900/10" : "border-slate-200 dark:border-slate-700 hover:border-primary-300"}">
-          <input type="radio" name="address_id" value="${a.id}" ${i === 0 ? "checked" : ""} class="mt-1 text-primary-600 focus:ring-primary-500" onchange="BookingModule.selectAddress('${a.id}')">
-          <div class="flex-1">
-            <p class="font-medium text-slate-800 dark:text-white text-sm">${a.label || a.type || "Address"} · ${a.name || ""}</p>
-            <p class="text-xs text-slate-500 mt-0.5">${a.address_line1 || a.line1}, ${a.city}, ${a.pincode || a.postal_code}</p>
-            <p class="text-xs text-slate-500">${a.phone || ""}</p>
-          </div>
-        </label>
-      `
-        )
-        .join("") + `
-        <button type="button" onclick="BookingModule.showAddAddress()" class="w-full py-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl text-sm text-slate-500 hover:border-primary-400 hover:text-primary-600 transition-colors">
+      container.innerHTML =
+        addresses
+          .map(
+            (a, i) => `
+          <label class="flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all
+            ${i === 0 ? "border-primary-500 bg-primary-50 dark:bg-primary-900/10" : "border-slate-200 dark:border-slate-700 hover:border-primary-300"}">
+            <input type="radio" name="address_id" value="${a.id}" ${i === 0 ? "checked" : ""}
+                   class="mt-1 text-primary-600 focus:ring-primary-500"
+                   onchange="BookingModule.selectAddress('${a.id}')">
+            <div class="flex-1">
+              <p class="font-medium text-slate-800 dark:text-white text-sm">
+                ${a.label || a.type || "Address"} · ${a.name || ""}
+              </p>
+              <p class="text-xs text-slate-500 mt-0.5">
+                ${a.address_line1 || a.line1}, ${a.city}, ${a.pincode || a.postal_code}
+              </p>
+              <p class="text-xs text-slate-500">${a.phone || ""}</p>
+            </div>
+          </label>
+        `
+          )
+          .join("") +
+        `
+        <button type="button" onclick="BookingModule.showAddAddress()"
+                class="w-full py-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl text-sm text-slate-500 hover:border-primary-400 hover:text-primary-600 transition-colors">
           + Add New Address
         </button>
       `;
@@ -220,10 +260,12 @@ const BookingModule = {
 
   selectAddress(id) {
     this.state.address_id = id;
+
     document.querySelectorAll("#booking-addresses label").forEach((l) => {
       l.classList.remove("border-primary-500", "bg-primary-50", "dark:bg-primary-900/10");
       l.classList.add("border-slate-200", "dark:border-slate-700");
     });
+
     const selected = document.querySelector(`input[name="address_id"][value="${id}"]`)?.closest("label");
     if (selected) {
       selected.classList.add("border-primary-500", "bg-primary-50", "dark:bg-primary-900/10");
@@ -298,13 +340,30 @@ const BookingModule = {
     const container = document.getElementById("time-slots");
     if (!container) return;
 
-    // Generate slots (backend can override)
-    const slots = [
+    const allSlots = [
       "09:00", "10:00", "11:00", "12:00",
       "14:00", "15:00", "16:00", "17:00", "18:00",
     ];
 
-    container.innerHTML = slots
+    // Disable past slots when date is today
+    const now = new Date();
+    const isToday = date === now.toISOString().split("T")[0];
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+
+    const availableSlots = allSlots.filter((slot) => {
+      if (!isToday) return true;
+      const [h, m] = slot.split(":").map(Number);
+      return h > currentHour || (h === currentHour && m > currentMinute + 30);
+    });
+
+    if (!availableSlots.length) {
+      container.innerHTML = `<p class="text-sm text-slate-500 col-span-full">No available slots for today. Please choose another date.</p>`;
+      this.state.time_slot = null;
+      return;
+    }
+
+    container.innerHTML = availableSlots
       .map(
         (s) => `
       <button type="button" data-slot="${s}" onclick="BookingModule.selectSlot('${s}')"
@@ -318,10 +377,12 @@ const BookingModule = {
 
   selectSlot(slot) {
     this.state.time_slot = slot;
+
     document.querySelectorAll(".time-slot").forEach((b) => {
       b.classList.remove("border-primary-500", "bg-primary-50", "dark:bg-primary-900/20", "text-primary-700");
       b.classList.add("border-slate-200", "dark:border-slate-700");
     });
+
     const btn = document.querySelector(`[data-slot="${slot}"]`);
     if (btn) {
       btn.classList.add("border-primary-500", "bg-primary-50", "dark:bg-primary-900/20", "text-primary-700");
@@ -335,12 +396,14 @@ const BookingModule = {
       Helper.toast("Enter a coupon code", "warning");
       return;
     }
+
     try {
       Helper.showLoader();
       const result = await API.coupons.validate(code, {
         service_id: this.state.service_id,
-        worker_id: this.state.worker_id,
+        worker_id: this.state.worker_id || undefined,
       });
+
       this.state.coupon_code = code;
       this.state.discount = result.discount || result.amount || 0;
       Helper.toast(`Coupon applied! ${Helper.formatCurrency(this.state.discount)} off`, "success");
@@ -349,6 +412,7 @@ const BookingModule = {
       Helper.toast(err.message || "Invalid coupon", "error");
       this.state.coupon_code = null;
       this.state.discount = 0;
+      this.updateSummaryUI();
     } finally {
       Helper.hideLoader();
     }
@@ -364,10 +428,33 @@ const BookingModule = {
   },
 
   updateSummaryUI() {
-    // Summary is calculated on backend ideally; frontend shows estimates
     const el = document.getElementById("booking-summary");
     if (!el) return;
-    // Placeholder until API returns full summary on create
+
+    // Basic estimate (backend will calculate final amount)
+    const basePrice = this.state.service?.starting_price || this.state.service?.price || 0;
+    const discount = this.state.discount || 0;
+    const total = Math.max(0, basePrice - discount);
+
+    el.innerHTML = `
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-slate-500">Service (starting)</span>
+          <span>${Helper.formatCurrency(basePrice)}</span>
+        </div>
+        ${discount > 0 ? `
+          <div class="flex justify-between text-emerald-600">
+            <span>Coupon (${this.state.coupon_code})</span>
+            <span>-${Helper.formatCurrency(discount)}</span>
+          </div>
+        ` : ""}
+        <div class="flex justify-between font-semibold text-base pt-2 border-t border-slate-200 dark:border-slate-700">
+          <span>Estimated Total</span>
+          <span class="text-primary-600">${Helper.formatCurrency(total)}</span>
+        </div>
+        <p class="text-xs text-slate-400 mt-1">Final amount confirmed after booking</p>
+      </div>
+    `;
   },
 
   async submitBooking(e) {
@@ -388,21 +475,27 @@ const BookingModule = {
 
     const notes = document.getElementById("booking-notes")?.value || "";
 
+    // Build clean payload – only send worker_id when selected
     const payload = {
       service_id: this.state.service_id,
-      worker_id: this.state.worker_id,
       address_id: this.state.address_id,
       booking_date: this.state.date,
       booking_time: this.state.time_slot,
       payment_method: this.state.payment_method,
-      coupon_code: this.state.coupon_code || null,
       notes,
     };
+
+    if (this.state.worker_id) {
+      payload.worker_id = this.state.worker_id;
+    }
+    if (this.state.coupon_code) {
+      payload.coupon_code = this.state.coupon_code;
+    }
 
     try {
       Helper.showLoader();
       const booking = await API.bookings.create(payload);
-      // Store for success page
+
       sessionStorage.setItem("last_booking", JSON.stringify(booking));
       window.location.href = `/booking-success.html?id=${booking.id || booking.booking_id}`;
     } catch (err) {
@@ -424,6 +517,7 @@ const BookingModule = {
     try {
       const params = {};
       if (status) params.status = status;
+
       const data = await API.bookings.list(params);
       const bookings = data.results || data.items || data || [];
 
@@ -467,21 +561,25 @@ const BookingModule = {
           </div>
         </div>
         <div class="flex flex-wrap gap-2">
-          <a href="/booking-history.html?id=${b.id}" class="px-3 py-1.5 text-xs font-medium border border-slate-200 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+          <a href="/booking-history.html?id=${b.id}"
+             class="px-3 py-1.5 text-xs font-medium border border-slate-200 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
             Details
           </a>
           ${b.status === "completed" ? `
-            <button onclick="ReviewModule.openReview('${b.id}', '${b.worker_id}')" class="px-3 py-1.5 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300 rounded-lg hover:bg-amber-100 transition-colors">
+            <button onclick="ReviewModule.openReview('${b.id}', '${b.worker_id}')"
+                    class="px-3 py-1.5 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300 rounded-lg hover:bg-amber-100 transition-colors">
               Rate
             </button>
           ` : ""}
           ${["pending", "accepted"].includes(b.status) ? `
-            <button onclick="BookingModule.cancelBooking('${b.id}')" class="px-3 py-1.5 text-xs font-medium text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-50 transition-colors">
+            <button onclick="BookingModule.cancelBooking('${b.id}')"
+                    class="px-3 py-1.5 text-xs font-medium text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-50 transition-colors">
               Cancel
             </button>
           ` : ""}
           ${b.status === "completed" ? `
-            <a href="/booking.html?service_id=${b.service_id}&worker_id=${b.worker_id}" class="px-3 py-1.5 text-xs font-medium text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors">
+            <a href="/booking.html?service_id=${b.service_id}&worker_id=${b.worker_id}"
+               class="px-3 py-1.5 text-xs font-medium text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors">
               Rebook
             </a>
           ` : ""}
@@ -493,6 +591,7 @@ const BookingModule = {
   async cancelBooking(id) {
     if (!confirm("Are you sure you want to cancel this booking?")) return;
     const reason = prompt("Reason for cancellation (optional):") || "";
+
     try {
       Helper.showLoader();
       await API.bookings.cancel(id, reason);
@@ -519,7 +618,11 @@ const BookingModule = {
     ];
 
     if (status === "cancelled") {
-      return `<div class="flex items-center justify-center gap-2 py-4 text-rose-600"><i class="fas fa-times-circle text-xl"></i><span class="font-semibold">Booking Cancelled</span></div>`;
+      return `
+        <div class="flex items-center justify-center gap-2 py-4 text-rose-600">
+          <i class="fas fa-times-circle text-xl"></i>
+          <span class="font-semibold">Booking Cancelled</span>
+        </div>`;
     }
 
     const currentIdx = steps.findIndex((s) => s.key === status?.toLowerCase());
@@ -531,23 +634,28 @@ const BookingModule = {
             const done = i <= currentIdx;
             const active = i === currentIdx;
             return `
-            <div class="flex flex-col items-center min-w-[70px] relative">
-              ${i < steps.length - 1 ? `<div class="absolute top-4 left-1/2 w-full h-0.5 ${i < currentIdx ? "bg-primary-500" : "bg-slate-200 dark:bg-slate-700"}"></div>` : ""}
-              <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center ${done ? "bg-primary-600 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-400"} ${active ? "ring-4 ring-primary-200 dark:ring-primary-900" : ""}">
-                <i class="fas ${step.icon} text-xs"></i>
+              <div class="flex flex-col items-center min-w-[70px] relative">
+                ${i < steps.length - 1
+                  ? `<div class="absolute top-4 left-1/2 w-full h-0.5 ${i < currentIdx ? "bg-primary-500" : "bg-slate-200 dark:bg-slate-700"}"></div>`
+                  : ""}
+                <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center
+                  ${done ? "bg-primary-600 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-400"}
+                  ${active ? "ring-4 ring-primary-200 dark:ring-primary-900" : ""}">
+                  <i class="fas ${step.icon} text-xs"></i>
+                </div>
+                <span class="text-[10px] mt-1.5 font-medium ${done ? "text-primary-600" : "text-slate-400"} text-center">
+                  ${step.label}
+                </span>
               </div>
-              <span class="text-[10px] mt-1.5 font-medium ${done ? "text-primary-600" : "text-slate-400"} text-center">${step.label}</span>
-            </div>
-          `;
+            `;
           })
           .join("")}
       </div>
     `;
   },
 
-  /**
-   * Worker booking actions
-   */
+  /* ========== Worker Actions ========== */
+
   async workerAccept(id) {
     try {
       Helper.showLoader();

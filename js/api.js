@@ -3,6 +3,12 @@
  * All HTTP requests go through this module.
  */
 
+const CONFIG = {
+  API_BASE_URL: "https://ustaji-backend.onrender.com/api",
+  RETRY_ATTEMPTS: 2,
+  REQUEST_TIMEOUT: 15000,
+};
+
 const API = {
   /**
    * Core request method with auth, timeout, retry
@@ -18,17 +24,6 @@ const API = {
       isFormData = false,
     } = options;
 
-    const CONFIG = {
-  API_BASE_URL: "https://ustaji-backend.onrender.com/api",
-  RETRY_ATTEMPTS: 2,
-  REQUEST_TIMEOUT: 15000
-};
-
-const API = {
-
-
-
-
     const defaultHeaders = {};
     if (!isFormData) defaultHeaders["Content-Type"] = "application/json";
     defaultHeaders["Accept"] = "application/json";
@@ -40,6 +35,8 @@ const API = {
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    const url = `${CONFIG.API_BASE_URL}${endpoint}`;   // ← missing piece
 
     const fetchOptions = {
       method,
@@ -362,7 +359,7 @@ const API = {
     },
   },
 
-
+  // ========== Admin ==========
   admin: {
     login(data) {
       return API.post("/admin/login", data, { auth: false });
