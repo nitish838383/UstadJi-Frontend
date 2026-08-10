@@ -19,8 +19,14 @@ const API = {
     } = options;
 
     const CONFIG = {
-    API_BASE_URL: "https://ustaji-backend.onrender.com"
+  API_BASE_URL: "https://ustaji-backend.onrender.com/api",
+  RETRY_ATTEMPTS: 2,
+  REQUEST_TIMEOUT: 15000
 };
+
+const API = {
+
+
 
 
     const defaultHeaders = {};
