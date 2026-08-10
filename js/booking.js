@@ -15,51 +15,22 @@ const BookingModule = {
     summary: null,
   },
 
- /**
- * Initialize booking form page
- */
-async init() {
-  if (!Auth.requireAuth("user")) return;
+  /**
+   * Initialize booking form page
+   */
+  async init() {
+    if (!Auth.requireAuth("user")) return;
 
-  this.state.service_id = Helper.getQueryParam("service_id");
-  this.state.worker_id = Helper.getQueryParam("worker_id");
+    this.state.service_id = Helper.getQueryParam("service_id");
+    this.state.worker_id = Helper.getQueryParam("worker_id");
 
-  await this.loadAddresses();
-
-  // ==========================================
-  // SERVICE SE BOOKING
-  // booking.html?service_id=2
-  // ==========================================
-  if (this.state.service_id) {
-    await this.loadServiceInfo();
-
-    // Service ke professionals load karo
+    await this.loadAddresses();
+    if (this.state.service_id) await this.loadServiceInfo();
+    // Always load professional picker (list + optional pre-selected worker)
     await this.loadProfessionals();
-  }
+    this.bindEvents();
+  },
 
-  // ==========================================
-  // PROFESSIONAL SE BOOKING
-  // booking.html?worker_id=3
-  // ==========================================
-  else if (this.state.worker_id) {
-    // Pehle professional load karo
-    await this.loadWorkerInfo();
-
-    // Worker ke response se service ID nikalo
-    const workerServiceId =
-      this.state.worker?.service_id ||
-      this.state.worker?.service?.id;
-
-    if (workerServiceId) {
-      this.state.service_id = workerServiceId;
-
-      // Ab professional ki service load karo
-      await this.loadServiceInfo();
-    }
-  }
-
-  this.bindEvents();
-},
   async loadServiceInfo() {
     try {
       const service = await API.services.get(this.state.service_id);
