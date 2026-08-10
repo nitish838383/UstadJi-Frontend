@@ -155,86 +155,151 @@ const CONFIG = {
       return API.get("https://ustaji-backend.onrender.com/api/auth/me");
     },
   },
+// ========== Services ==========
+services: {
+  list(params = {}) {
+    const qs = new URLSearchParams(params).toString();
 
-  // ========== Services ==========
-  services: {
-    list(params = {}) {
-      const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/services${qs ? "?" + qs : ""}`);
-    },
-    get(id) {
-      return API.get(`https://ustaji-backend.onrender.com/api/services/${id}`);
-    },
-    categories() {
-      return API.get("https://ustaji-backend.onrender.com/api/services/categories");
-    },
-    search(query) {
-      return API.get(`https://ustaji-backend.onrender.com/api/services/search?q=${encodeURIComponent(query)}`);
-    },
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/services${qs ? "?" + qs : ""}`
+    );
   },
 
-  // ========== Workers ==========
-  workers: {
-    list(params = {}) {
-      const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/workers${qs ? "?" + qs : ""}`);
-    },
-    get(id) {
-      return API.get(`https://ustaji-backend.onrender.com/api/workers/${id}`);
-    },
-    byService(serviceId, params = {}) {
-      const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/workers/service/${serviceId}${qs ? "?" + qs : ""}`);
-    },
-    search(query) {
-      return API.get(`https://ustaji-backend.onrender.com/api/workers/search?q=${encodeURIComponent(query)}`);
-    },
-    reviews(workerId, params = {}) {
-      const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/workers/${workerId}/reviews${qs ? "?" + qs : ""}`);
-    },
+  get(id) {
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/services/${id}`
+    );
   },
 
-  // ========== Bookings ==========
-  bookings: {
-    create(data) {
-      return API.post("https://ustaji-backend.onrender.com/api/bookings", data);
-    },
-    list(params = {}) {
-      const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/bookings${qs ? "?" + qs : ""}`);
-    },
-    get(id) {
-      return API.get(`https://ustaji-backend.onrender.com/api/bookings/${id}`);
-    },
-    cancel(id, reason) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/cancel`, { reason });
-    },
-    reschedule(id, data) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/reschedule`, data);
-    },
-    invoice(id) {
-      return API.get(`https://ustaji-backend.onrender.com/api/bookings/${id}/invoice`);
-    },
-    // Worker actions
-    accept(id) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/accept`);
-    },
-    reject(id, reason) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/reject`, { reason });
-    },
-    start(id) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/start`);
-    },
-    complete(id) {
-      return API.post(`https://ustaji-backend.onrender.com/api/bookings/${id}/complete`);
-    },
-    workerList(params = {}) {
-      const qs = new URLSearchParams(params).toString();
-      return API.get(`https://ustaji-backend.onrender.com/api/bookings/worker${qs ? "?" + qs : ""}`);
-    },
+  categories() {
+    return API.get(
+      "https://ustaji-backend.onrender.com/api/services/categories"
+    );
   },
 
+  search(query) {
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/services/search?q=${encodeURIComponent(query)}`
+    );
+  },
+},
+
+// ========== Workers ==========
+workers: {
+  list(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/workers${qs ? "?" + qs : ""}`
+    );
+  },
+
+  get(id) {
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/workers/${id}`
+    );
+  },
+
+  byService(serviceId, params = {}) {
+    const qs = new URLSearchParams(params).toString();
+
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/workers/service/${serviceId}${qs ? "?" + qs : ""}`
+    );
+  },
+
+  search(query) {
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/workers/search?q=${encodeURIComponent(query)}`
+    );
+  },
+
+  reviews(workerId, params = {}) {
+    const qs = new URLSearchParams(params).toString();
+
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/workers/${workerId}/reviews${qs ? "?" + qs : ""}`
+    );
+  },
+},
+
+// ========== Bookings ==========
+bookings: {
+  create(data) {
+    return API.post(
+      "https://ustaji-backend.onrender.com/api/bookings",
+      data
+    );
+  },
+
+  list(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/bookings${qs ? "?" + qs : ""}`
+    );
+  },
+
+  get(id) {
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/bookings/${id}`
+    );
+  },
+
+  cancel(id, reason) {
+    return API.post(
+      `https://ustaji-backend.onrender.com/api/bookings/${id}/cancel`,
+      { reason }
+    );
+  },
+
+  reschedule(id, data) {
+    return API.post(
+      `https://ustaji-backend.onrender.com/api/bookings/${id}/reschedule`,
+      data
+    );
+  },
+
+  invoice(id) {
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/bookings/${id}/invoice`
+    );
+  },
+
+  // Worker actions
+  accept(id) {
+    return API.post(
+      `https://ustaji-backend.onrender.com/api/bookings/${id}/accept`
+    );
+  },
+
+  reject(id, reason) {
+    return API.post(
+      `https://ustaji-backend.onrender.com/api/bookings/${id}/reject`,
+      { reason }
+    );
+  },
+
+  start(id) {
+    return API.post(
+      `https://ustaji-backend.onrender.com/api/bookings/${id}/start`
+    );
+  },
+
+  complete(id) {
+    return API.post(
+      `https://ustaji-backend.onrender.com/api/bookings/${id}/complete`
+    );
+  },
+
+  workerList(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+
+    return API.get(
+      `https://ustaji-backend.onrender.com/api/bookings/worker${qs ? "?" + qs : ""}`
+    );
+  },
+},
   // ========== Profile ==========
   profile: {
     get() {
