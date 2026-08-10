@@ -37,7 +37,7 @@ const ServicesModule = {
               <span>${time}</span>
             </div>
           </div>
-          <button onclick="event.preventDefault(); window.location.href='/booking.html?service_id=${service.id}'" 
+          <button onclick="event.preventDefault(); event.stopPropagation(); Auth.requireBooking('?service_id=${service.id}')"
                   class="mt-4 w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium text-sm transition-colors flex items-center justify-center gap-2">
             <i class="fas fa-calendar-check"></i> Book Now
           </button>
@@ -147,7 +147,7 @@ const ServicesModule = {
     main.innerHTML = `
       <div class="grid lg:grid-cols-2 gap-8">
         <div class="rounded-2xl overflow-hidden shadow-lg">
-          <img src="${img}" alt="${service.title || service.name}" class="w-full h-80 object-cover" 
+          <img src="${img}" alt="${service.title || service.name}" class="w-full h-80 object-cover"
                onerror="this.src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&h=500&fit=crop'">
         </div>
         <div>
@@ -157,7 +157,7 @@ const ServicesModule = {
             <span class="text-sm text-slate-500">${rating.toFixed(1)} (${reviews} reviews)</span>
           </div>
           <p class="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">${service.description || ""}</p>
-          
+
           <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-4">
               <p class="text-xs text-slate-500 mb-1">Starting Price</p>
@@ -182,10 +182,10 @@ const ServicesModule = {
             </div>
           ` : ""}
 
-          <a href="/booking.html?service_id=${service.id}" 
+          <button type="button" onclick="Auth.requireBooking('?service_id=${service.id}')"
              class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-colors shadow-lg shadow-primary-600/25">
             <i class="fas fa-calendar-check"></i> Book This Service
-          </a>
+          </button>
         </div>
       </div>
     `;

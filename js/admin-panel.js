@@ -4,7 +4,7 @@
  */
 const AdminAPI = {
   base() {
-    const b = (typeof CONFIG !== "undefined" && CONFIG.API_BASE_URL) || "https://ustaji-backend.onrender.com/api";
+    const b = (typeof CONFIG !== "undefined" && CONFIG.API_BASE_URL) || "http://127.0.0.1:8000/api";
     return b.replace(/\/$/, "");
   },
   token() {

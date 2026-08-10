@@ -26,7 +26,8 @@ const BookingModule = {
 
     await this.loadAddresses();
     if (this.state.service_id) await this.loadServiceInfo();
-    if (this.state.worker_id) await this.loadWorkerInfo();
+    // Always load professional picker (list + optional pre-selected worker)
+    await this.loadProfessionals();
     this.bindEvents();
   },
 
@@ -52,95 +53,125 @@ const BookingModule = {
   },
 
   async loadWorkerInfo() {
+    /* kept for compatibility — preferred path is loadProfessionals() */
     try {
       const worker = await API.workers.get(this.state.worker_id);
-      const el = document.getElementById("booking-worker-info");
-      if (el) {
-        el.innerHTML = `
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold">
-              ${Helper.getInitials(worker.full_name || worker.name || "W")}
-            </div>
-            <div>
-              <p class="font-semibold text-slate-800 dark:text-white">${worker.full_name || worker.name}</p>
-              <div class="flex items-center gap-1 text-xs">${Helper.renderStars(worker.rating || 0)} · ${worker.rating?.toFixed(1) || "0"}</div>
-            </div>
-          </div>
-        `;
-      }
       this.state.worker = worker;
     } catch (err) {
       Helper.toast("Failed to load professional", "error");
     }
   },
+
+  /**
+   * Load professionals for booking picker (real API)
+   * - Optional auto-assign (no worker)
+   * - List from /workers or /workers/service/{id}
+   */
   async loadProfessionals() {
-  const container = document.getElementById("booking-worker-info");
+    const el = document.getElementById("booking-worker-info");
+    if (!el) return;
+    el.innerHTML = `<p class="text-sm text-slate-400">Loading professionals…</p>`;
 
-  if (!container || !this.state.service_id) return;
+    try {
+      let workers = [];
+      if (this.state.service_id && API.workers.byService) {
+        try {
+          const data = await API.workers.byService(this.state.service_id, { limit: 30 });
+          workers = data.results || data.items || data || [];
+        } catch {
+          workers = [];
+        }
+      }
+      if (!workers.length) {
+        const data = await API.workers.list({ limit: 30 });
+        workers = data.results || data.items || data || [];
+      }
+      // Only active/available when fields exist
+      workers = (Array.isArray(workers) ? workers : []).filter((w) => w.is_active !== false);
 
-  container.innerHTML = `
-    <p class="text-sm text-slate-400">
-      Loading professionals...
-    </p>
-  `;
+      const selectedId = this.state.worker_id ? String(this.state.worker_id) : "";
 
-  try {
-    const workers = await API.workers.byService(
-      this.state.service_id
-    );
+      const autoCard = `
+        <label class="flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${!selectedId ? "border-primary-500 bg-primary-50 dark:bg-primary-900/10" : "border-slate-200 dark:border-slate-700 hover:border-primary-300"}">
+          <input type="radio" name="worker_id" value="" ${!selectedId ? "checked" : ""} class="mt-1 text-primary-600 focus:ring-primary-500" onchange="BookingModule.selectWorker('')">
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-slate-800 dark:text-white text-sm">Auto-assign</p>
+            <p class="text-xs text-slate-500 mt-0.5">We’ll assign an available professional for you</p>
+          </div>
+        </label>`;
 
-    console.log("Workers:", workers);
+      if (!workers.length) {
+        el.innerHTML = autoCard + `<p class="text-xs text-slate-400 mt-2">No professionals listed yet — booking will use auto-assign.</p>`;
+        this.state.worker_id = null;
+        this.state.worker = null;
+        return;
+      }
 
-    if (!Array.isArray(workers) || workers.length === 0) {
-      container.innerHTML = `
-        <p class="text-sm text-slate-400">
-          No professionals available for this service.
-        </p>
-      `;
-      return;
+      const cards = workers
+        .map((w) => {
+          const id = String(w.id);
+          const sel = selectedId === id;
+          const name = w.full_name || w.name || "Professional";
+          const rating = w.rating != null ? Number(w.rating).toFixed(1) : "0";
+          const area = w.service_area || w.city || "";
+          return `
+          <label class="flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${sel ? "border-primary-500 bg-primary-50 dark:bg-primary-900/10" : "border-slate-200 dark:border-slate-700 hover:border-primary-300"}">
+            <input type="radio" name="worker_id" value="${id}" ${sel ? "checked" : ""} class="mt-1 text-primary-600 focus:ring-primary-500" onchange="BookingModule.selectWorker('${id}')">
+            <div class="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+              ${Helper.getInitials(name)}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-slate-800 dark:text-white text-sm truncate">${name}</p>
+              <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 mt-0.5">
+                <span>${Helper.renderStars ? Helper.renderStars(w.rating || 0) : "★"} ${rating}</span>
+                ${area ? `<span>· ${area}</span>` : ""}
+                ${w.is_available === false ? `<span class="text-amber-600">Busy</span>` : `<span class="text-emerald-600">Available</span>`}
+              </div>
+            </div>
+          </label>`;
+        })
+        .join("");
+
+      el.innerHTML = `<div class="space-y-3">${autoCard}${cards}</div>`;
+
+      if (selectedId) {
+        const w = workers.find((x) => String(x.id) === selectedId);
+        if (w) this.state.worker = w;
+      } else {
+        this.state.worker_id = null;
+        this.state.worker = null;
+      }
+    } catch (err) {
+      el.innerHTML = `
+        <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-primary-500 bg-primary-50 dark:bg-primary-900/10 cursor-pointer">
+          <input type="radio" name="worker_id" value="" checked class="mt-1" onchange="BookingModule.selectWorker('')">
+          <div>
+            <p class="font-medium text-sm">Auto-assign</p>
+            <p class="text-xs text-slate-500">Could not load list — professional will be assigned later</p>
+          </div>
+        </label>`;
+      this.state.worker_id = null;
     }
+  },
 
-    container.innerHTML = workers.map(worker => `
-      <label class="block cursor-pointer mb-3">
-        <input
-          type="radio"
-          name="professional"
-          value="${worker.id}"
-          class="sr-only peer"
-          onchange="BookingModule.selectProfessional(${worker.id})"
-        >
-
-        <div class="
-          p-4 rounded-xl border-2
-          border-slate-200
-          peer-checked:border-blue-500
-          peer-checked:bg-blue-50
-        ">
-          <p class="font-semibold">
-            ${worker.full_name || worker.name || "Professional"}
-          </p>
-
-          <p class="text-sm text-slate-500">
-            ⭐ ${worker.rating || "0.0"}
-          </p>
-        </div>
-      </label>
-    `).join("");
-
-  } catch (error) {
-    console.error("Workers API error:", error);
-
-    container.innerHTML = `
-      <p class="text-sm text-red-500">
-        Failed to load professionals.
-      </p>
-    `;
-  }
-},
-
-selectProfessional(workerId) {
-  this.state.worker_id = workerId;
-},
+  selectWorker(id) {
+    if (!id) {
+      this.state.worker_id = null;
+      this.state.worker = null;
+    } else {
+      this.state.worker_id = id;
+    }
+    // refresh border styles
+    document.querySelectorAll('#booking-worker-info label').forEach((lab) => {
+      const input = lab.querySelector('input[name="worker_id"]');
+      const on = input && String(input.value) === String(id || "");
+      lab.classList.toggle("border-primary-500", on);
+      lab.classList.toggle("bg-primary-50", on);
+      lab.classList.toggle("dark:bg-primary-900/10", on);
+      lab.classList.toggle("border-slate-200", !on);
+      lab.classList.toggle("dark:border-slate-700", !on);
+    });
+  },
 
   async loadAddresses() {
     const container = document.getElementById("booking-addresses");
